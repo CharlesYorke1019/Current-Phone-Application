@@ -1,6 +1,7 @@
 # Current-Phone-Application
 Code for phone application as of September 6th, 2023.
 
+Application is written in JS (React-Native) and uses Socket.io for a server
 
 Just started teaching myself React/React-Native about 3 weeks ago (this was written on Wed, September 20th, 2023) so there are definitly some things to approve upon
 
