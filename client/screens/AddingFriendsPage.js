@@ -1,12 +1,12 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
-import React, { useState } from 'react';
+import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import React, { useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native'
 
-import GoBackButton from '../Components/GoBackButton';
-
 const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
-    const navigation = useNavigation();
 
+    // Variables //
+
+    const navigation = useNavigation();
     let user = userObj;
     let setter = setterAddingFriendInit;
 
@@ -17,35 +17,56 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
     let [readyResponse, setReadyResponse] = useState(false);
     let [responseType, setResponseType] = useState(0);
 
+    const usernameRef = useRef();
+
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
+
+    const xOutOfResponse = () => {
+        if (responseType === 200) {
+            setterAddingFriendInit(false);
+            setReadyResponse(false)
+        } else if (responseType === 400) {
+            setReadyResponse(false);
+        }
+    }
+
+    const xOutOfPageNoEntry = () => {
+        setterAddingFriendInit(false)
+        usernameRef.current.clear();
+    }
+
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
     user.socket.on('friendRequestCleared', () => {
         setResponseText('Friend Request Was Sent!')
         setReadyResponse(true)
         setResponseType(200);
+
+        usernameRef.current.clear();
+        friendUsernameHolder = '';
     })
 
     user.socket.on('friendRequestFailed', () => {
         setResponseText('Friend Request Failed Please Check The Username.')
         setReadyResponse(true)
         setResponseType(400)
+
+        // usernameRef.current.clear();
     })
 
-    const xOutOfResponse = () => {
-        if (responseType === 200) {
-            setterAddingFriendInit(false);
-        } else if (responseType === 400) {
-            setReadyResponse(false);
-        }
-    }
+    //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 2, backgroundColor: 'papayawhip'}}>
-            {/* <GoBackButton sentS={socket} sentU={user} /> */}
-
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip'}}>
             <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
-                <View style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -206, width: '100%'}}>
+                <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -205, width: '100%'}}>
                     <Button 
                         title='X'
-                        onPress={() => setterAddingFriendInit(false)}
+                        onPress={() => xOutOfPageNoEntry()}
                         color='black'
                     />
                 </View>
@@ -54,6 +75,8 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
                     value={friendUsernameHolder}
                     onChangeText={(friend) => submittedFriendUsername = friend}
                     style={styles.inputStyle}
+                    ref={usernameRef}
+                    placeholder='enter here'
                 />
                 <View style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 130}}>
                     <Button 
@@ -93,6 +116,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         position: 'absolute',
         alignSelf: 'center',
-        top: -30
+        top: -30,
+        textAlign: 'center'
     }
 })

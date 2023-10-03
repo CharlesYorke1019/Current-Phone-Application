@@ -1,9 +1,10 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native'
+import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import React, { useState, useRef } from 'react';
 
 
-const CreatingGroupPage = ({creatingGroupInit, setCreatingGroup, user}) => {
+const CreatingGroupPage = ({setCreatingGroup, user}) => {
+
+    // Variables //
 
     let [groupName, setGroupName] = useState('');
     let groupNameHolder;
@@ -12,12 +13,11 @@ const CreatingGroupPage = ({creatingGroupInit, setCreatingGroup, user}) => {
     let [responseText, setResponseText] = useState('')
     let [responseType, setResponseType] = useState(0)
 
-    user.socket.on('groupCreationCleared', (groupInfo) => {
-        setResponseText('Group Has Been Created!')
-        setReadyResponse(true)
-        setResponseType(200);
-        user.addGroup(groupInfo)
-    })
+    const groupNameRef = useRef();
+
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
 
     const xOutOfResponse = () => {
         if (responseType === 200) {
@@ -27,6 +27,20 @@ const CreatingGroupPage = ({creatingGroupInit, setCreatingGroup, user}) => {
             setReadyResponse(false)
         }
     }
+
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
+    user.socket.on('groupCreationCleared', (groupInfo) => {
+        setResponseText('Group Has Been Created!')
+        setReadyResponse(true)
+        setResponseType(200);
+        groupNameRef.current.clear();
+        user.addGroup(groupInfo)
+    })
+
+    //////////////////////////////////////////////////////////////////
 
     return (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', height: '35%'}}>
@@ -45,6 +59,8 @@ const CreatingGroupPage = ({creatingGroupInit, setCreatingGroup, user}) => {
                     value={groupNameHolder}
                     onChangeText={(i) => setGroupName(i)}
                     style={styles.inputStyle}
+                    ref={groupNameRef}
+                    placeholder='enter here'
                 />
 
 
@@ -86,6 +102,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         borderWidth: 2,
         alignSelf: 'center',
-        marginBottom: 20
+        marginBottom: 20,
+        textAlign: 'center',
     }
 })

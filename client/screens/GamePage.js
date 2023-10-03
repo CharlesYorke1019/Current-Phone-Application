@@ -1,16 +1,12 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
-import Draggable from 'react-native-draggable';
-import {player1, player2, player3, player4, roundEnder, setPf, winnerSubmitted, displayWinnerOfRound, displayNextRound2Room, nextRoundIsInitiated} from './PlayerLogic';
-import Player from '../Models/PlayerModel';
 import { PlayerGameView } from '../Models/PlayerViewModel';
 import { GameViewModel } from '../Models/GameViewModel';
-import GameModel from '../Models/GameModel';
-
 
 const GamePage = ({route}) => {
 
+    // Variables //
 
     const navigation = useNavigation();
     let user = route.params.paramKey
@@ -26,11 +22,21 @@ const GamePage = ({route}) => {
 
     let GModle;
 
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
+
+    user.changeCurrentPage('GamePage')
+
     for (let i = 0; i < sentGameObj.pNickNames.length; i++) {
         if (user.socket.id === sentGameObj.players[i]) {
             user.playerGameObj.turn = i + 1;
         }
     }
+
+    //////////////////////////////////////////////////////////////////
+
+    // Game Elements //
 
     GModle = (
         <GameViewModel rS={sentGameSize} user={user} gameObj={sentGameObj} gameStarted={gameStarted} setGameStart={setGameStarted} playerView={tableView} setPlayerView={setTableView} />
@@ -41,6 +47,8 @@ const GamePage = ({route}) => {
             <PlayerGameView userObj={user} gameStarted={gameStarted} playerView={tableView} setPlayerView={setTableView} />
         )
     }
+
+    //////////////////////////////////////////////////////////////////
     
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>

@@ -1,12 +1,15 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
-import React from 'react';
+import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import Player from '../Models/PlayerModel'
 
 import GoHomeButton from '../Components/GoHomeButton';
-import ProfileButton from './ProfilePage';
+import ProfileButton from '../Components/ProfileButton';
 
 const PlayerInGameDisplays = ({route}) => {
+
+    // Variables // 
+
     const navigation = useNavigation();
     let user = route.params.paramKey
 
@@ -15,8 +18,30 @@ const PlayerInGameDisplays = ({route}) => {
         enteredDisplayBuyIn: null
     }
 
+    const buyInRef = useRef();
+
+    let [displayName, setDisplayName] = useState(user.accountInfo.username)
+    let [buyIn, setBuyIn] = useState(user.profileOptions.preSetChipAmount.toString());
+
     let displayNameHolder;
-    let displayBuyInHolder;
+    let buyInHolder;
+
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
+
+    user.changeCurrentPage('PlayerInGameDisplays');
+
+    const inGameDisplayInfoSubmitted = () => {
+        currentUser.enteredDisplayName = displayName;
+        currentUser.enteredDisplayBuyIn = buyIn;
+
+        user.socket.emit('playerSubmitsInGameDisplayInfo', currentUser)
+    }
+
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
 
     user.socket.on('sendingUserToGamePage', (roomId, gameObj) => {
         user.inGame = true;
@@ -27,30 +52,37 @@ const PlayerInGameDisplays = ({route}) => {
         })
     })
 
+    //////////////////////////////////////////////////////////////////
+
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey', backgroundColor: 'mistyrose'}}>
-            <GoHomeButton />
+            <ProfileButton sentU={user} />
+            <GoHomeButton user={user} />
             <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 150, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
                 <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Display Name</Text>
                 <TextInput 
-                    value={displayNameHolder}
-                    onChangeText={(displayName) => currentUser.enteredDisplayName = displayName}
+                    value={displayName}
+                    onChangeText={(v) => setDisplayName(v)}
                     style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
+                    placeholder='enter here'
+                    onSubmitEditing={() => buyInRef.current.focus()}
                 />
             </View>
             <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 325, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
                 <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Buy-In</Text>
                 <TextInput 
-                    value={displayBuyInHolder}
-                    onChangeText={(displayBuyIn) => currentUser.enteredDisplayBuyIn = displayBuyIn}
+                    value={buyIn}
+                    onChangeText={(v) => setBuyIn(v)}
                     style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
+                    placeholder='enter here'
+                    ref={buyInRef}
                 />
             </View>
             <View style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 550, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey'}}>
                 <Button 
                     title='Enter Game'
                     color='black'
-                    onPress={() => user.socket.emit('playerSubmitsInGameDisplayInfo', currentUser)}
+                    onPress={() => inGameDisplayInfoSubmitted()}
                 />
             </View>
             <View style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 630, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey'}}>

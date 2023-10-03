@@ -1,4 +1,4 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 
@@ -7,9 +7,8 @@ import User from '../Models/UserModel';
 
 const io = require('socket.io-client');
 
-
 const Home = () => {
-    const socket = io("http://192.168.1.76:5000")
+    const socket = io("http://192.168.1.80:5000")
 
     const navigation = useNavigation();
 
@@ -25,14 +24,16 @@ const Home = () => {
     
     const [user, setUser] = useState(new User(makeId(30), 'guest', false, {}, false, {}, socket))
 
+    user.changeCurrentPage('Home');
+
     user.socket.on('userConnects', () => {
         user.socket.emit('confirmedUserConnects', (user.socket.id));  
     })
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+        <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             <ProfileButton sentU={user} />
-            <View style={{alignContent: 'center', justifyContent: 'center', position: 'absolute', top: 200, borderWidth: 4, width: '100%', borderRadius: 5, backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', justifyContent: 'center', borderWidth: 4, width: '100%', height: '70%', borderRadius: 5, backgroundColor: 'papayawhip', marginTop: 20}}>
                 <Text style={styles.headerStyle}>Pocket Chips</Text>
                 <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey',alignSelf: 'center',width: 200, alignItems: 'center', marginBottom: 40}}>
                     <Button 
@@ -70,11 +71,10 @@ const styles = StyleSheet.create({
     },
 
     headerStyle: {
-        fontSize: 70,
+        fontSize: 80,
         alignSelf: 'center',
         marginBottom: 60,
         textAlign: 'center',
-        marginTop: 10
     },
 
     profileStyle: {

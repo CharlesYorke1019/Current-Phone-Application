@@ -1,35 +1,46 @@
-import { Button, Text, View, LogBox, TouchableOpacity, ScrollView } from 'react-native';
+import { Button, Text, View, LogBox, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
-
 import CreatingGroupPage from './CreatingGroupPage';
 import SpecificGroupView from './SpecificGroupView';
 
 const GroupsPage = ({route}) => {
 
-    LogBox.ignoreLogs([
-        'Non-serializable values were found in the navigation state',
-    ]);
+    // Variables //
 
     const navigation = useNavigation();
     let user = route.params.paramKey
-
     let [creatingGroupInit, setCreatingGroupInit] = useState(false);
     let [viewingGroup, setViewingGroup] = useState(false);
     let [specificGroupName, setSpecificGroupName] = useState('');
     let [specificGroupMembers, setSpecificGroupMembers] = useState('')
 
+    let groupsArr = [];
 
-    user.socket.on('groupInviteHasBeenAccepted', (groupInfo) => {
-        user.updateGroupInfo(groupInfo);
-    })
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
+
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state',
+    ]);
 
     const setSpecificGroupView = (name) => {
         setSpecificGroupName(name);
         setViewingGroup(true);
     }
 
-    let groupsArr = [];
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
+    user.socket.on('groupInviteHasBeenAccepted', (groupInfo) => {
+        user.updateGroupInfo(groupInfo);
+    })
+
+    //////////////////////////////////////////////////////////////////
+
+    // Group Page Elements //
 
     for (let i = 0; i < user.groupNames.length; i++) {
         groupsArr.push(
@@ -40,6 +51,8 @@ const GroupsPage = ({route}) => {
             </TouchableOpacity>
         )
     }
+
+    //////////////////////////////////////////////////////////////////
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
@@ -72,7 +85,7 @@ const GroupsPage = ({route}) => {
             </View>
 
             <View style={{flex: 1, display: creatingGroupInit === true ? 'flex' : 'none', width: '80%', marginTop: 160}}>
-                <CreatingGroupPage creatingGroupInit={creatingGroupInit} setCreatingGroup={setCreatingGroupInit} user={user} />
+                <CreatingGroupPage setCreatingGroup={setCreatingGroupInit} user={user} />
             </View>
 
             <View style={{flex: 1, display: viewingGroup === true ? 'flex' : 'none', width: '80%', marginTop: 120}}>    
@@ -82,7 +95,6 @@ const GroupsPage = ({route}) => {
 
         </View>
     )
-
 }
 
 export default GroupsPage

@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, LogBox, TextInput, ScrollView} from 'react-native';
+import { Button, StyleSheet, Text, View, LogBox, TextInput, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
@@ -7,6 +7,9 @@ import GoHomeButton from '../Components/GoHomeButton';
 import ProfileButton from '../Components/ProfileButton';
 
 const CreateGame = ({route}) => {
+
+    // Variables //
+
     const navigation = useNavigation();
     let user = route.params.paramKey
 
@@ -21,6 +24,12 @@ const CreateGame = ({route}) => {
     let [svScrollable, setSVScrollable] = useState(true);
     let [bbMinRangeInput, setBBMinRangeInput] = useState(10);
     let [bbMaxRangeInput, setBBMaxRangeInput] = useState(40);
+
+    //////////////////////////////////////////////////////////////////
+
+    // Functions //
+
+    user.changeCurrentPage('CreateGame');
 
     const setBBRange = (v1, v2) => {
         setBBMinRangeInput(v1);
@@ -44,16 +53,22 @@ const CreateGame = ({route}) => {
         'Non-serializable values were found in the navigation state',
     ]);
 
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
     user.socket.on('gameStateCreated', () => {
         navigation.navigate('PlayerInGameDisplays', {
             paramKey: user,
         })
     })
 
+    //////////////////////////////////////////////////////////////////
+
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey', backgroundColor: 'mistyrose', height: '100%', width: '100%'}}>
-            {/* <ProfileButton sentU={user} sentS={socket} /> */}
-            <GoHomeButton />
+            <ProfileButton sentU={user} />
+            <GoHomeButton user={user} />
 
             <View style={{borderWidth: 1, borderColor: 'black', position: 'absolute', top: 57, backgroundColor: 'lightgrey', borderRadius: '50%', height: 30, width: 30, left: 30, alignSelf: 'center'}}>
                 <Button 
@@ -289,7 +304,7 @@ const CreateGame = ({route}) => {
             </View>
 
 
-            <View style={{marginBottom: 900}}>
+            <View style={{marginBottom: 825}}>
                 {/* exists so that I can actually scroll in my scroll view without it snapping back to the top */}
             </View>
 
