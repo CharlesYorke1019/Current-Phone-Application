@@ -1,12 +1,11 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native'
+import { Text, View } from 'react-native';
+import React from 'react';
 
 const FriendsListDisplay = ({username}) => {
 
     return (
-        <View style={{borderWidth: 2, backgroundColor: 'lightgrey', marginLeft: 5, marginRight: 5, marginTop: 5, width: 100, height: 20}}>
-            <Text style={{textAlign: 'center', fontSize: 12}}>{username}</Text>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignItems: 'center', maxWidth: '50%', height: '10%', justifyContent: 'center', marginLeft: 10, marginRight: 10, marginTop: 10}}>
+            <Text style={{textAlign: 'center', fontSize: 20, marginRight: 20, marginLeft: 20}}>{username}</Text>
         </View>
     )
 

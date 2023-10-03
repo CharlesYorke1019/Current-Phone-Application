@@ -2,16 +2,16 @@ import { SafeAreaView, Button, StyleSheet, Text, View, TextInput, Pressable } fr
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native'
 
-const GoBackButton = ({sentU, sentS}) => {
+const GoBackButton = ({user, gameObj}) => {
     const navigation = useNavigation();
 
+
     return (
-        <View style={{backgroundColor:'lightgrey', position: 'absolute', top: 50, borderWidth: 1, borderRadius: 3, borderColor: 'black'}}>
+        <View style={{backgroundColor:'lightgrey', position: 'absolute', top: 50, borderWidth: 3, borderRadius: 5, borderColor: 'black'}}>
             <Button 
-                title='Go Back'
-                onPress={() => navigation.navigate('Profile', {
-                    paramKey: sentU,
-                    socketKey: sentS
+                title='Back'
+                onPress={() => navigation.navigate(`${user.currentPage}`, {
+                    paramKey: user,
                 })}
                 color='black'
             />
