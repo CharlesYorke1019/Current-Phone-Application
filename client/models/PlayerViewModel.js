@@ -1,5 +1,5 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import { Button, Text, View, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
 import Draggable from 'react-native-draggable';
 
 

@@ -60,6 +60,14 @@ class Player {
         this.setterChips(this.chips)
     }
 
+    displayChipsAnte(ante, blind) {
+        if (blind === 'bb') {
+            this.setterChips(this.chips - ante)
+        } else if (blind === 'sb') {
+            this.setterChips(this.chips - (ante / 2))
+        }
+    }
+
     calls() {
         if (this.currentGameTurn === this.turn) {
             this.chips -= this.betToCall

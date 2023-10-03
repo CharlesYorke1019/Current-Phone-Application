@@ -265,8 +265,6 @@ class GameModel {
                 this.gameArray.splice(i, 1);
             }
         }
-
-
     }
 
     changeRound(r) {
