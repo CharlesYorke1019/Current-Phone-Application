@@ -24,18 +24,21 @@ var globalState = {};
 var gameSettingsObj;
 
 const io = socketIO(server);
+
 io.on('connection', (socket) => {
-    // console.log('client connected on websocket');
-
-
 
     let userBEI = {
         "guest": true,
         "id": null,
         "roomLabel": null,
         "loggedIn": false,
-        "accountUsername": null
+        "accountUsername": null,
+        "caUsernameHolder": null
     };
+
+    //////////////////////////////////////////////////////////////////
+
+    ////// USER CONNECTING LISTENERS ////// 
 
     socket.emit('userConnects');
 
@@ -43,25 +46,195 @@ io.on('connection', (socket) => {
         userBEI.id = id;
     })
 
+    //////////////////////////////////////////////////////////////////
+
+    ////// USER CREATE ACCOUNT / LOG In LISTENERS //////
+
     socket.on('userCreatesAccount', (createdAccount) => {
-        possibleAccounts[createdAccount.chosenUN] = {username: createdAccount.chosenUN, password: createdAccount.chosenP, idHolder: userBEI.id, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: []}
-        socket.emit('userAccountValid');
+        if (!possibleAccounts[createdAccount.chosenUN]) {
+            userBEI.caUsernameHolder = createdAccount.chosenUN;
+            possibleAccounts[createdAccount.chosenUN] = {username: createdAccount.chosenUN, password: createdAccount.chosenP, idHolder: userBEI.id, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: [], loggedIn: false, email: null, profileOptions:  {'useUsername': 'No', 'usePreSetChips': 'No', 'preSetChipAmount': 0}}
+            socket.emit('userAccountValid');
+        } else {
+            socket.emit('userAccountInvalid')
+        }
     })
 
-    socket.on('userLogsIn', (loggedInAccount) => {
-        if (possibleAccounts[loggedInAccount.username]) {
-            if (loggedInAccount.password === possibleAccounts[loggedInAccount.username].password) {
-                possibleAccounts[loggedInAccount.username].idHolder = userBEI.id;
-                userBEI.accountUsername = loggedInAccount.username
-                socket.emit('logInSuccessful', possibleAccounts[loggedInAccount.username])
+    socket.on('userLogsIn', (loggedInAccount, method) => {
+
+        if (method === 'via_email') {
+            for (var key in possibleAccounts) {
+                if (possibleAccounts[key].email === loggedInAccount.username) {
+                    if (possibleAccounts[key].password === loggedInAccount.password) {
+                        possibleAccounts[key].idHolder = userBEI.id;
+                        possibleAccounts[key].loggedIn = true;
+                        userBEI.accountUsername = possibleAccounts[key].username
+                        socket.emit('logInSuccessful', possibleAccounts[key])
+                    } else {
+                        socket.emit('logInFailed')
+                    }
+                } else {
+                    socket.emit('logInFailed')
+                }
+            }
+        } else if (method === 'via_username') {
+            if (possibleAccounts[loggedInAccount.username]) {
+                if (loggedInAccount.password === possibleAccounts[loggedInAccount.username].password) {
+                    possibleAccounts[loggedInAccount.username].idHolder = userBEI.id;
+                    possibleAccounts[loggedInAccount.username].loggedIn = true;
+                    userBEI.accountUsername = loggedInAccount.username
+                    socket.emit('logInSuccessful', possibleAccounts[loggedInAccount.username])
+                } else {
+                    socket.emit('logInFailed')
+                }
+            } else {
+                socket.emit('logInFailed')
             }
         }
-        // console.log(possibleAccounts)
+    }) 
+
+    socket.on('userConfirmsSignOut', () => {
+        possibleAccounts[userBEI.accountUsername].loggedIn = false;
+        userBEI.loggedIn = false;
+        socket.emit('sendingBackSignOutConfirmation');
     })
 
-    socket.on('grabbingUserInfoForProfilePage', () => {
-        socket.emit('sendingBackUserForProfilePage', possibleAccounts[userBEI.accountUsername])
+    socket.on('newUserInfoSaved', (username, password, email) => {
+        if (username != userBEI.accountUsername) {
+            // username was changed
+            if (!possibleAccounts[username]) {
+                possibleAccounts[username] = possibleAccounts[userBEI.accountUsername];
+                possibleAccounts[username].username = username
+
+                delete possibleAccounts[userBEI.accountUsername];
+
+                userBEI.accountUsername = username;
+                
+                socket.emit('newUserInfoConfirmed', 'username_change', username);
+            } else {
+                socket.emit('newInfoUserCannotBeSaved', 'username_exists')
+            }
+        } else if (email != possibleAccounts[userBEI.accountUsername].email) {
+            possibleAccounts[userBEI.accountUsername].email = email;
+
+            socket.emit('newUserInfoConfirmed', 'email_change', email)
+        }
+        
+        
+        // if (password != possibleAccounts[userBEI.accountUsername].password) {
+        //     // password was changed
+        //     possibleAccounts[userBEI.accountUsername].password = password;
+
+        //     socket.emit('newUserInfoConfirmed', 'password_change', password)
+        // } 
+        
+        // if (email != possibleAccounts[userBEI.accountUsername].email) {
+        //     possibleAccounts[userBEI.accountUsername].email = email;
+
+        //     socket.emit('newUserInfoConfirmed', 'email_change', email)
+        // }
     })
+
+    socket.on('newUserGameInfoSaved', (usernameDisplay, preSetChips, preSetChipsAmount) => {
+        possibleAccounts[userBEI.accountUsername].profileOptions.useUsername = usernameDisplay;
+        possibleAccounts[userBEI.accountUsername].profileOptions.usePreSetChips = preSetChips;
+
+        if (preSetChips === 'No') {
+            possibleAccounts[userBEI.accountUsername].profileOptions.preSetChipAmount = '';
+        } else if (preSetChips === 'Yes') {
+            possibleAccounts[userBEI.accountUsername].profileOptions.preSetChipAmount = preSetChipsAmount;
+        }
+
+        socket.emit('newUserGameInfoConfirmed', possibleAccounts[userBEI.accountUsername].profileOptions)
+
+    })
+
+    //////////////////////////////////////////////////////////////////
+
+    ////// SOCIALS LISTENERS //////
+
+    // Friend Listeners //
+
+    socket.on('userSendsFriendRequest', (friendUsername) => {
+        if (possibleAccounts[friendUsername]) {
+            let newAlert = {'type': 'friend_request', 'sender': userBEI.accountUsername}
+            possibleAccounts[friendUsername].pendingAlerts.push(newAlert);
+            possibleAccounts[friendUsername].friendRequests.push(userBEI.accountUsername);
+            io.to(possibleAccounts[friendUsername].idHolder).emit('sendingFriendRequestToReciever', newAlert)
+            socket.emit('friendRequestCleared');
+        } else {
+            socket.emit('friendRequestFailed');
+        }
+    })
+
+    socket.on('friendRequestAccepted', (alertInfo, index) => {
+        possibleAccounts[userBEI.accountUsername].friendsList.push(alertInfo.sender)
+        possibleAccounts[alertInfo.sender].friendsList.push(userBEI.accountUsername);
+        socket.emit('friendRequestAcceptedConfirmed', alertInfo, index);
+        io.to(possibleAccounts[alertInfo.sender].idHolder).emit('userAcceptedFriendRequest', userBEI.accountUsername);
+    })
+
+    // Groups Listeners //
+
+    socket.on('groupCreated', (groupName) => {
+        possibleAccounts[userBEI.accountUsername].groups[groupName] = {'host': userBEI.accountUsername, members: [userBEI.accountUsername], name: groupName, totalMembers: 1}
+        possibleAccounts[userBEI.accountUsername].groupNames.push(groupName);
+        socket.emit('groupCreationCleared', possibleAccounts[userBEI.accountUsername].groups[groupName]); 
+    })
+
+    socket.on('groupInviteSent', (username, groupName) => {
+        if (possibleAccounts[username]) {
+            let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName}
+            possibleAccounts[username].pendingAlerts.push(newAlert)
+
+            io.to(possibleAccounts[username].idHolder).emit('sendingGroupInvite', newAlert);
+            socket.emit('groupInviteConfirmed');
+            
+        } else {
+            socket.emit('groupInviteFailed');
+        }
+    })
+
+    socket.on('groupRequestAccepted', (alertInfo, index) => {
+        possibleAccounts[alertInfo.sender].groups[alertInfo.groupName].members.push(userBEI.accountUsername);
+        possibleAccounts[alertInfo.sender].groups[alertInfo.groupName].totalMembers++;
+        possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName] = possibleAccounts[alertInfo.sender].groups[alertInfo.groupName];
+
+        io.to(possibleAccounts[alertInfo.sender].idHolder).emit('groupInviteHasBeenAccepted', possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName])
+        socket.emit('sendingGroupInfoAfterInviteAccepted', possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName], alertInfo, index)
+
+    })
+
+    socket.on('startingGameWithGroup', (groupPlayersArr) => {
+        console.log(groupPlayersArr);
+    })
+
+    // Other Listeners //
+
+    socket.on('requestDeclined', (alertInfo, index) => {
+        socket.emit('sendingBackRequestDecline', alertInfo, index)
+    })
+
+    socket.on('invitingPlayerToGame', (username) => {
+        if (possibleAccounts[username]) {
+            io.to(possibleAccounts[username].idHolder).emit('sendingGameInvite', {'type': 'game_invite', 'sender': userBEI.accountUsername, 'gameCode': userBEI.roomLabel});
+            socket.emit('inviteToGameConfirmed');
+        } else {
+            socket.emit('inviteToGameFailed');
+        }
+    })
+
+    socket.on('gameInviteAccepted', (alertInfo, index) => {
+        userBEI.roomLabel = alertInfo.gameCode;
+        socket.join(alertInfo.gameCode);
+        socket.emit('sendingUserToGameAfterAccept', alertInfo, index);
+    })
+
+    //////////////////////////////////////////////////////////////////
+
+    ////// GAME LISTENERS //////
+
+    // Pre Game Listeners //
 
     socket.on('newGame', (rS, ante, timer, progressiveBlinds, gameStyle, bbMinRange, bbMaxRange, chipUnits) => {
         var roomName
@@ -71,54 +244,33 @@ io.on('connection', (socket) => {
 
             roomName = makeId(5);
 
-            socket.join(roomName);
-
             userBEI['roomLabel'] = roomName;
 
-            gameSettingsObj = {};
+            socket.join(roomName);
 
-            gameSettingsObj['players'] = [];
-
-            gameSettingsObj['idHolder'] = roomName;
-
-            gameSettingsObj['pNickNames'] = [];
-
-            gameSettingsObj['pChips'] = [];
-
-            gameSettingsObj['gameStarted'] = false;
-
-            gameSettingsObj['currentRoomSize'] = 1;
-
-            gameSettingsObj['gameStarted'] = false;
-
-            gameSettingsObj['updatedPChips'] = [];
-
-            gameSettingsObj['desiredRoomSize'] = rS;
-
-            gameSettingsObj['ante'] = ante;
-
-            gameSettingsObj['timer'] = timer;
-
-            gameSettingsObj['gameStyle'] = gameStyle
-
-            gameSettingsObj['progressiveBlinds'] = progressiveBlinds;
-
-            gameSettingsObj['minBuyIn'] = (bbMinRange * ante);
-
-            gameSettingsObj['maxBuyIn'] = (bbMaxRange * ante);
-
-            gameSettingsObj['chipUnits'] = chipUnits;
-
-            gameSettingsObj['playerObjects'] = {};
+            gameSettingsObj = {
+                active: true,
+                players: [],
+                idHolder: roomName,
+                pNickNames: [],
+                pChips: [],
+                gameStarted: false,
+                updatedPChips: [],
+                desiredRoomSize: rS,
+                ante: ante,
+                timer: timer,
+                gameStyle: gameStyle,
+                progressiveBlinds: progressiveBlinds,
+                minBuyIn: (bbMinRange * ante),
+                maxBuyIn: (bbMaxRange * ante),
+                chipUnits: chipUnits,
+            };
 
             globalState[roomName.toString()] = gameSettingsObj;
 
             socket.emit('gameStateCreated');
 
         }
-
-        console.log(globalState);
-
     })
 
     socket.on('playerEntersGameCode', (gameCode) => {
@@ -126,6 +278,8 @@ io.on('connection', (socket) => {
             userBEI.roomLabel = gameCode;
             socket.join(gameCode)
             socket.emit('userIsClearedToJoinGame')
+        } else {
+            socket.emit('gameCodeDoesNotExist');
         }
     })
 
@@ -135,108 +289,39 @@ io.on('connection', (socket) => {
             globalState[userBEI.roomLabel].pChips.push(Number(displayObj.enteredDisplayBuyIn))
             globalState[userBEI.roomLabel].players.push(userBEI.id)
 
-            for (let i = 0; i < globalState[userBEI.roomLabel].pNickNames.length; i++) {
-                if (displayObj.enteredDisplayName === globalState[userBEI.roomLabel].pNickNames[i]) {
-                    globalState[userBEI.roomLabel].playerObjects[i + 1] = {'displayName': globalState[userBEI.roomLabel].pNickNames[i], 'chipCount': globalState[userBEI.roomLabel].pChips[i], 'inGameTurn': i + 1}
-                }
-            }
-
-            console.log(globalState[userBEI.roomLabel]);
-
             io.to(userBEI.roomLabel).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel]);
         }
     })
 
-    socket.on('playerChecks', () => {
-        console.log('player checks');
-        io.to(userBEI.roomLabel).emit('sendingBackPlayerCheck')
-    })
-
-    socket.on('bounds', (bounds) => {
-        console.log(bounds)
-    })
-
     socket.on('initGameStarted', (info, info2) => {
         io.to(userBEI.roomLabel).emit('sendingBackGameStart', info)
+    })    
+
+    // In Game Listeners //
+
+    socket.on('winnerHasBeenChosen', (winner) => {
+        console.log(winner);
+        io.to(userBEI.roomLabel).emit('sendingBackWinnerOfRound', winner)
     })
 
-    socket.on('currentRoundHasJustEnded', () => {
-        // io.to(userBEI.roomLabel).emit('sendingBackSubmittedWinnerOfRound');
-        io.to(userBEI.roomLabel).emit('signlaingEndOfCurrentRound');
+    socket.on('initNextRound', () => {
+        io.to(userBEI.roomLabel).emit('sendingBackInitNextRound');
     })
 
-    socket.on('roundIsOver', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackSubmittedWinnerOfRound');
+    socket.on('userLeavesGame', (turn) => {
+        globalState[userBEI.roomLabel].players[turn - 1] = '';
+        globalState[userBEI.roomLabel].pNickNames[turn - 1] = '';
+        globalState[userBEI.roomLabel].pChips[turn - 1] = '';
+
+        io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
+
+        userBEI.roomLabel = null;
     })
 
-    socket.on('nextRoundInitiated', () => {
-        io.to(userBEI.roomLabel).emit('displayingNextRoundInitiation');
-    })
+    socket.on('roomSizeChanged', (newRS) => {
+        globalState[userBEI.roomLabel].desiredRoomSize = newRS;
 
-
-    //////////////////////////////////////////////////////////////////
-
-    socket.on('userSendsFriendRequest', (friendUsername) => {
-        if (possibleAccounts[friendUsername]) {
-            possibleAccounts[friendUsername].pendingAlerts.push({'type': 'friend_request', 'sender': userBEI.accountUsername});
-            possibleAccounts[friendUsername].friendRequests.push(userBEI.accountUsername);
-            io.to(possibleAccounts[friendUsername].idHolder).emit('sendingFriendRequestToReciever', userBEI.accountUsername)
-            socket.emit('friendRequestCleared');
-        } else {
-            socket.emit('friendRequestFailed');
-        }
-    })
-
-    socket.on('requestAccepted', (type, username, index) => {
-        possibleAccounts[userBEI.accountUsername].friendsList.push(username)
-        possibleAccounts[username].friendsList.push(userBEI.accountUsername);
-        socket.emit('requestAcceptedConfirmed', username, index);
-        io.to(possibleAccounts[username].idHolder).emit('userAcceptedFriendRequest', userBEI.accountUsername);
-    })
-
-    socket.on('groupCreated', (groupName) => {
-        if (possibleAccounts[userBEI.accountUsername]) {
-            possibleAccounts[userBEI.accountUsername].groups[groupName] = {'host': userBEI.accountUsername, members: [userBEI.accountUsername], name: groupName, totalMembers: 1}
-            possibleAccounts[userBEI.accountUsername].groupNames.push(groupName);
-            socket.emit('groupCreationCleared', possibleAccounts[userBEI.accountUsername].groups[groupName]); 
-        }
-    })
-
-    socket.on('GroupInviteSent', (username, groupName) => {
-        if (possibleAccounts[username]) {
-            possibleAccounts[username].pendingAlerts.push({'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName})
-            io.to(possibleAccounts[username].idHolder).emit('sendingGroupInvite', userBEI.accountUsername, groupName);
-            socket.emit('GroupInviteConfirmed');
-            
-        } else {
-            socket.emit('GroupInviteFailed');
-        }
-    })
-
-    socket.on('groupInviteAccepted', (sender, groupName, index) => {
-        possibleAccounts[sender].groups[groupName].members.push(userBEI.accountUsername);
-        possibleAccounts[sender].groups[groupName].totalMembers++;
-        possibleAccounts[userBEI.accountUsername].groups[groupName] = possibleAccounts[sender].groups[groupName];
-
-        console.log(possibleAccounts[userBEI.accountUsername].groups[groupName]);
-
-        io.to(possibleAccounts[sender].idHolder).emit('groupInviteHasBeenAccepted', possibleAccounts[userBEI.accountUsername].groups[groupName])
-        socket.emit('sendingGroupInfo', possibleAccounts[userBEI.accountUsername].groups[groupName], index)
-
-    })
-
-    socket.on('grabbingAnyPendingAlerts', () => {
-        socket.emit('sendingBackAnyPendingAlerts', possibleAccounts[userBEI.accountUsername].friendRequests)
-    })
-
-    socket.on('requestDeclined', (type, index) => {
-        socket.emit('sendingBackRequestDecline', type, index)
-    })
-
-    //////////////////////////////////////////////////////////////////
-
-    socket.on('currentRoundHasEnded', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackCurrentRoundEnder');
+        io.to(userBEI.roomLabel).emit('sendingBackRSChange', newRS)
     })
 
     // PLAYER IN GAME LISTENERS //
@@ -257,89 +342,20 @@ io.on('connection', (socket) => {
         io.to(userBEI.roomLabel).emit('playerChecks', turn)
     })
 
-    socket.on('WinnerHasBeenChosen', (winner) => {
-        console.log(winner);
-        io.to(userBEI.roomLabel).emit('sendingBackWinnerOfRound', winner)
-    })
-
-    socket.on('initNextRound', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackInitNextRound');
-    })
-
-    ///////// P1 /////////
-    socket.on('p1SubmitsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP1Bet', chips)
-    })
-
-    socket.on('p1Checks', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP1Check');
-    })
-
-    socket.on('p1CallsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP1CalledBet', chips)
-    })
-
-    socket.on('p1Folds', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP1Fold');
-    })
-
-    ///////// P2 /////////
-    socket.on('p2SubmitsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP2Bet', chips)
-    })
-
-    socket.on('p2Checks', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP2Check');
-    })
-
-    socket.on('p2CallsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP2CalledBet', chips)
-    })
-
-    socket.on('p2Folds', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP2Fold');
-    })
-
-    ///////// P3 /////////
-    socket.on('p3SubmitsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP3Bet', chips)
-    })
-
-    socket.on('p3Checks', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP3Check');
-    })
-
-    socket.on('p3CallsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP3CalledBet', chips)
-    })
-
-    socket.on('p3Folds', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP3Fold');
-    })
-
-    ///////// P4 /////////
-    socket.on('p4SubmitsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP4Bet', chips)
-    })
-
-    socket.on('p4Checks', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP4Check');
-    })
-
-    socket.on('p4CallsBet', (chips) => {
-        io.to(userBEI.roomLabel).emit('sendingBackP4CalledBet', chips)
-    })
-
-    socket.on('p4Folds', () => {
-        io.to(userBEI.roomLabel).emit('sendingBackP4Fold');
-    })
     
 
-    // setInterval(() => {
-    //     io.emit('ping', { data: (new Date()) / 1 });
-    // }, 1000);
 });
 
 
 
 server.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`));
+
+
+
+
+
+
+
+// setInterval(() => {
+//     io.emit('ping', { data: (new Date()) / 1 });
+// }, 1000);
