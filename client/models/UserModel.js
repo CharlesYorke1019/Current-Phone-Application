@@ -10,6 +10,8 @@ class User {
     currentPage;
     socket;
     gameId;
+    creatingGameMethod;
+    groupMembersGameArr;
     friendRequests = [];
     friendsList = [];
     groups = {}
@@ -112,6 +114,7 @@ class User {
     leaveGame(arg) {
         this.socket.emit('userLeavesGame', arg);
         this.currentPage = 'Home';
+        this.playerGameObject;
     }
 
     updateAccountInfo(changeType, infoChanged) {

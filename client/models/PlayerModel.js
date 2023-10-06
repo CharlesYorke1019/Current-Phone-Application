@@ -9,6 +9,10 @@ class Player {
     socket;
     setterChips;
     currentGameTurn;
+    currentGamePot;
+    currentGameAnte;
+    currentGameBettor;
+    currentGameRound;
     betToCall;
     setterBetAmount;
     tapCount = 0;
@@ -70,9 +74,20 @@ class Player {
 
     calls() {
         if (this.currentGameTurn === this.turn) {
-            this.chips -= this.betToCall
+            if (this.currentGameBettor === 0) {
+                if (this.currentGameRound === 0) {
+                    this.betToCall = this.currentGameAnte;
+                }
+            } 
+
+            this.chips -= this.betToCall;
+
             this.socket.emit('pCallsBet', this.turn, this.betToCall, this.chips)
         }
+    }
+
+    displayCall() {
+        this.setterChips(this.chips)
     }
 
     folds() {
@@ -97,6 +112,14 @@ class Player {
     winnerOfRound(chipsWon) {
         // this.chips += chipsWon;
         this.setterChips(this.chips + chipsWon);
+    }
+
+    setInGameInfo(gameModel) {
+        this.currentGameTurn = gameModel.currentTurn;
+        this.currentGamePot = gameModel.pot;
+        this.currentGameAnte = gameModel.ante;
+        this.currentGameBettor = gameModel.currentBettor;
+        this.currentGameRound = gameModel.currentRound;
     }
 
 }

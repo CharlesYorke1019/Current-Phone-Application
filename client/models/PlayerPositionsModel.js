@@ -19,11 +19,11 @@ const settingPlayerPositions = (rS) => {
         }
         let p2 = {
             pTop: 390,
-            pLeft: 140
+            pLeft: -60
         }
         let p3 = {
             pTop: 390,
-            pLeft: -60
+            pLeft: 140
         }
 
         inGamePlayerPositions.push(p1, p2, p3)

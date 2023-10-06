@@ -4,13 +4,18 @@ import Draggable from 'react-native-draggable';
 
 
 export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}) => {
+
+    // Variables //
+
     let user = userObj;
 
     let [playerChips, setPlayerChips] = useState(user.playerGameObj.chips)
     let [playerBetAmount, setPlayerBetAmount] = useState(user.playerGameObj.betAmount)
-
+    
     user.playerGameObj.setterChips = setPlayerChips;
     user.playerGameObj.setterBetAmount = setPlayerBetAmount;
+
+    //////////////////////////////////////////////////////////////////
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderColor: 'lightgrey', width: '100%', height: '100%', display: gameStarted === true && playerView === false ? 'flex' : 'none', position: 'absolute'}}>
@@ -33,6 +38,24 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}
                         onPress={() => setPlayerBetAmount(0)}
                     />
                 </View>
+
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%', position: 'absolute', top: 212, alignSelf: 'center', left: 20}}
+                    onPress={() => setPlayerBetAmount(user.playerGameObj.currentGameAnte)}
+                >
+                    <Text style={{textAlign: 'center', fontSize: 22}}>Ante</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%', position: 'absolute', top: 212, alignSelf: 'center', left: 150}}
+                    onPress={() => setPlayerBetAmount(user.playerGameObj.currentGamePot / 2)}
+                >
+                    <Text style={{textAlign: 'center', fontSize: 22}}>1/2 Pot</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%', position: 'absolute', top: 212, alignSelf: 'center', left: 270}}
+                    onPress={() => setPlayerBetAmount(playerChips)}
+                >
+                    <Text style={{textAlign: 'center', fontSize: 22}}>All-In</Text>
+                </TouchableOpacity>
             </TouchableOpacity>
 
             <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: '65%', left: '15%'}}>
@@ -59,22 +82,22 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}
 
             <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', position: 'absolute', top: '77%', width: '100%', height: '10%'}}>
                 <Draggable x={10} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 0.25)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'red'}}>
+                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', borderStyle: 'dashed'}}>
                         <Text style={{fontSize: 15}}>.25</Text>
                     </View>
                 </Draggable>
                 <Draggable x={100} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 0.50)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'yellow'}}>
+                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'red', borderStyle: 'dashed'}}>
                         <Text style={{fontSize: 15}}>.50</Text>
                     </View>
                 </Draggable>
                 <Draggable x={190} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 1)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'lightgreen'}}>
+                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'lightblue', borderStyle: 'dashed'}}>
                         <Text style={{fontSize: 15}}>1</Text>
                     </View>
                 </Draggable>
                 <Draggable x={280} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 5)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'violet'}}>
+                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'green', borderStyle: 'dashed'}}>
                         <Text style={{fontSize: 15}}>5</Text>
                     </View>
                 </Draggable>

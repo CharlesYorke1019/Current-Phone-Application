@@ -309,6 +309,10 @@ class GameModel {
         this.initRound()
     }
 
+    updateGameSize(arg) {
+        this.gameSize = arg;
+    }
+
 }
 
 export default GameModel
