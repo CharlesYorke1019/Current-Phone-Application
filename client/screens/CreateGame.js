@@ -110,7 +110,7 @@ const CreateGame = ({route}) => {
                 <Button 
                     title='Next'
                     color='black'
-                    onPress={() => user.socket.emit('newGame', activeButton, ante, useATimer, gameStyle, progressiveBlinds, bbMinRangeInput, bbMaxRangeInput, chipUnits)}
+                    onPress={() => user.socket.emit('newGame', activeButton, ante, useATimer, gameStyle, progressiveBlinds, bbMinRangeInput, bbMaxRangeInput, chipUnits, user.creatingGameMethod, user.groupMembersGameArr)}
                 />
             </View>
 

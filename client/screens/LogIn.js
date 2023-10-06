@@ -31,15 +31,7 @@ const LogIn = ({route}) => {
     // Functions //
 
     const userAttemptsToLogIn = () => {
-        let method;
-
-        if (liUser.username.includes('@')) {
-            method = 'via_email'
-        } else {
-            method = 'via_username'
-        }
-
-        user.socket.emit('userLogsIn', liUser, method)
+        user.socket.emit('userLogsIn', liUser)
     }
 
     const togglePassword = () => {
@@ -81,8 +73,8 @@ const LogIn = ({route}) => {
 
         setLoginFail(true)
 
-        usernameRef.current.clear();
-        passwordRef.current.clear();
+        // usernameRef.current.clear();
+        // passwordRef.current.clear();
 
         setTimeout(() => {
             setLoginFail(false)

@@ -26,6 +26,8 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
         } else if (responseType === 400) {
             setReadyResponse(false)
         }
+
+        // groupNameRef.current.clear();
     }
 
     //////////////////////////////////////////////////////////////////
@@ -36,7 +38,8 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
         setResponseText('Group Has Been Created!')
         setReadyResponse(true)
         setResponseType(200);
-        groupNameRef.current.clear();
+    
+
         user.addGroup(groupInfo)
     })
 

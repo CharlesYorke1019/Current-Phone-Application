@@ -1,21 +1,23 @@
 import { Button, Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InvitingFriendsToGroup from './InvitingFriendsToGroup';
+import { useNavigation } from '@react-navigation/native'
 
-const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName, groupInfo}) => {
+const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
 
     // Variables //
 
+    const navigation = useNavigation();
+
     let membersArr = [];
-    let inviteMembersArr = [];
 
     let [invitingMember, setInvitingMember] = useState(false);
 
     let [selectGroupMembers, setSelectGroupMembers] = useState([]);
 
-    let [hostOfGroup, setHostOfGroup] = useState();
-
     let [initStartGame, setInitStartGame] = useState(false);
+
+    let [isHost, setIsHost] = useState()
 
     let groupButtonsArr = [];
 
@@ -23,13 +25,44 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName, groupI
 
     // Functions //
 
+    useEffect(() => {
+        for (var key in user.groups) {
+            if (key === groupName) {
+                if (user.groups[key].host === user.accountInfo.username) {
+                    setIsHost(true);
+                } else {
+                    setIsHost(false);
+                }
+            }
+        }
+    })
+
     const initGroupInvite = () => {
         setInvitingMember(true)
     }
 
     const invitingPlayersToGroupGame = (username) => {
         if (initStartGame) {
-            setSelectGroupMembers(selectGroupMembers += username);
+            if (!selectGroupMembers.includes(username)) {
+                
+                selectGroupMembers.push(username)
+                // setSelectGroupMembers(selectGroupMembers)
+
+                setSelectGroupMembers([
+                    ...selectGroupMembers
+                ])
+            } else {
+
+                for (let i = 0; i < selectGroupMembers.length; i++) {
+                    if (selectGroupMembers[i] === username) {
+                        selectGroupMembers.splice(i, 1);
+                        setSelectGroupMembers([
+                            ...selectGroupMembers
+                        ])
+                    }
+                }
+
+            }
         }
     }
 
@@ -38,9 +71,21 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName, groupI
     }
 
     const xOutOfStartGame = () => {
-        setSelectGroupMembers([0]);
+        setSelectGroupMembers([]);
         setInitStartGame(false);
     }
+
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
+    user.socket.on('gameThroughGroupConfirmed', (membersInvitedArr) => {
+        user.creatingGameMethod = 'group_game';
+        user.groupMembersGameArr = membersInvitedArr;
+        navigation.navigate('CreateGame', {
+            paramKey: user
+        })
+    })
 
     //////////////////////////////////////////////////////////////////
 
@@ -50,16 +95,17 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName, groupI
         for (var key in user.groups) {
             if (key === groupName) {
                 for (let i = 0; i < user.groups[key].members.length; i++) {
-                    membersArr.push(
-                        <View key={i} style={{ borderWidth: 2, borderRadius: 5, minWidth: '25%', maxHeight: '15%', justifyContent: 'center', marginTop: 10, justifyContent: 'center', alignContent: 'center', backgroundColor: selectGroupMembers.includes(user.groups[key].members[i]) ? 'lightcoral' : 'lightgrey'}}>
-                            {/* <Text style={{textAlign: 'center', fontSize: 14}}>{user.groups[key].members[i]}</Text> */}
-                            <Button 
-                                title={user.groups[key].members[i]}
-                                color='black'
-                                onPress={() => invitingPlayersToGroupGame(user.groups[key].members[i])}
-                            />
-                        </View>
-                    )
+                    if (user.groups[key].members[i] != user.accountInfo.username) {
+                        membersArr.push(
+                            <View key={i} style={{ borderWidth: 2, borderRadius: 5, minWidth: '25%', maxHeight: '15%', justifyContent: 'center', marginTop: 10, justifyContent: 'center', alignContent: 'center', backgroundColor: selectGroupMembers.includes(user.groups[key].members[i]) === true ? 'lightcoral' : 'lightgrey'}}>
+                                <Button 
+                                    title={user.groups[key].members[i]}
+                                    color='black'
+                                    onPress={() => invitingPlayersToGroupGame(user.groups[key].members[i])}
+                                />
+                            </View>
+                        )
+                    }
                 }
                 if (user.groups[key].host === user.accountInfo.username) {
                     groupButtonsArr.push(
@@ -102,7 +148,7 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName, groupI
                 </View>
                 <Text style={{fontSize: 35, textAlign: 'center', marginBottom: 20, marginTop: 10, borderBottomWidth: 2}}>{groupName}</Text>
                 <Text style={{textAlign: 'center', marginBottom: 15, fontSize: 20}}>Members</Text>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', justifyContent: 'center', marginBottom: 20}}>
+                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', justifyContent: 'center', marginBottom: 20, display: isHost === true ? 'flex' : 'none'}}>
                     <Button 
                         title='Invite Members'
                         color='black'

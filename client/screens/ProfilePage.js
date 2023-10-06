@@ -68,6 +68,10 @@ const ProfilePage = ({route}) => {
         navigation.navigate('Home');
     })
 
+    user.socket.on('sendingGroupGameInvite', (inviteInfo) => {
+        user.addAlert(inviteInfo);
+    })
+
     //////////////////////////////////////////////////////////////////
 
     return (

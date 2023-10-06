@@ -12,6 +12,8 @@ const AlertsPage = ({route}) => {
     let alertsArr = [];
     let [pendingAlerts, setPendingAlerts] = useState();
 
+    let [responseText, setResponseText] = useState('');
+
     //////////////////////////////////////////////////////////////////
 
     // Functions //
@@ -26,11 +28,12 @@ const AlertsPage = ({route}) => {
 
     const requestAccepted = (cb, alertInfo, index) => {
         cb(false);
+        setResponseText('Invite Accepted!')
 
         if (alertInfo.type === 'friend_request') {
             user.addFriendToList(alertInfo.sender)
             user.socket.emit('friendRequestAccepted', alertInfo, index);
-        } else if (alertInfo.type === 'group_request') {
+        } else if (alertInfo.type === 'group_invite') {
             user.socket.emit('groupRequestAccepted', alertInfo, index)
         } else if (alertInfo.type === 'game_invite') {
             user.socket.emit('gameInviteAccepted', alertInfo, index)
@@ -39,6 +42,8 @@ const AlertsPage = ({route}) => {
 
     const requestDeclined = (cb, alertInfo, index) => {
         cb(false)
+        setResponseText('Invite Declined.')
+
         user.socket.emit('requestDeclined', alertInfo, index);
     }
 
@@ -61,9 +66,9 @@ const AlertsPage = ({route}) => {
         let [t, setT] = useState(true)
         if (user.alerts[i].type === 'friend_request') {
             alertsArr.push(
-                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5, display: t === true ? 'flex' : 'none'}}>
-                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{user.alerts[i].sender} has sent a friend request!</Text>
-                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
+                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
+                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has sent a friend request!` : `${responseText}`}</Text>
+                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
                         <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >
@@ -80,9 +85,9 @@ const AlertsPage = ({route}) => {
             )   
         } else if (user.alerts[i].type === 'group_invite') {
             alertsArr.push(
-                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5, display: t === true ? 'flex' : 'none'}}>
-                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{user.alerts[i].sender} has sent a group invite!</Text>
-                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
+                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
+                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has sent invited you to their group!` : `${responseText}`}</Text>
+                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
                         <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >
@@ -99,9 +104,9 @@ const AlertsPage = ({route}) => {
             )  
         } else if (user.alerts[i].type === 'game_invite') {
             alertsArr.push(
-                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5, display: t === true ? 'flex' : 'none'}}>
-                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{user.alerts[i].sender} has sent a game invite!</Text>
-                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
+                <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
+                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has invited you to a game!` : `${responseText}`}</Text>
+                    <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
                         <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >

@@ -18,11 +18,21 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
 
     // Functions //
 
-    const xOutOfResponse = () => {
-        if (responseType === 200) {
+    const xOutOfWindow = () => {
+        if (readyResponse) {
+            if (responseType === 200) {
+                setCurrentView(false);
+                usernameRef.current.clear();
+                setReadyResponse(false);
+            } else if (responseType === 400) {
+                setReadyResponse(false);
+            }
+        } else {
             setCurrentView(false);
-        } else if (responseType === 400) {
-            setReadyResponse(false);
+
+            if (submittedFriendUsername != null) {
+                usernameRef.current.clear();
+            }
         }
     }
 
@@ -34,32 +44,26 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
         setResponseText('Group Invite Has Been Sent!')
         setReadyResponse(true)
         setResponseType(200)
-
-        usernameRef.current.clear();
-        friendUsernameHolder = ''
     })
 
     user.socket.on('groupInviteFailed', () => {
-        setResponseText('Group Invite Failed. Please Try Again.')
+        setResponseText('Group Invite Failed. Please Check The Username.')
         setReadyResponse(true)
         setResponseType(400)
-
-        usernameRef.current.clear();
-        friendUsernameHolder = ''
     })
 
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 2, backgroundColor: 'papayawhip'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5}}>
+            <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 0, width: '100%'}}>
+                <Button 
+                    title='X'
+                    onPress={() => xOutOfWindow()}
+                    color='black'
+                />
+            </View>
             <View style={{display: readyResponse === false ? 'flex' : 'none', justifyContent: 'center', alignContent: 'center'}}>
-                <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -206, width: '100%', borderTopWidth: 3}}>
-                    <Button 
-                        title='X'
-                        onPress={() => setCurrentView(false)}
-                        color='black'
-                    />
-                </View>
                 <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130}}>Enter Username Of Friend You Want To Add</Text>
                 <TextInput 
                     value={friendUsernameHolder}
@@ -78,13 +82,6 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
             </View>
 
             <View style={{display: readyResponse === true ? 'flex' : 'none', justifyContent: 'center', alignContent: 'center'}}>
-                <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -198, width: '100%'}}>
-                    <Button 
-                        title='X'
-                        color='black'
-                        onPress={() => xOutOfResponse()}
-                    />
-                </View>
                 <Text style={{textAlign: 'center'}}>{responseText}</Text>
             </View>
         </View>
@@ -104,5 +101,6 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         position: 'absolute',
         alignSelf: 'center',
+        textAlign: 'center'
     }
 })

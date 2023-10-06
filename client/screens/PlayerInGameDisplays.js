@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, ActivityIndicator } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import Player from '../Models/PlayerModel'
@@ -19,9 +19,7 @@ const PlayerInGameDisplays = ({route}) => {
     }
 
     const buyInRef = useRef();
-
-    let [displayName, setDisplayName] = useState(user.accountInfo.username)
-    let [buyIn, setBuyIn] = useState(user.profileOptions.preSetChipAmount.toString());
+    let [initEnterGame, setInitEnterGame] = useState(false);
 
     let displayNameHolder;
     let buyInHolder;
@@ -33,8 +31,7 @@ const PlayerInGameDisplays = ({route}) => {
     user.changeCurrentPage('PlayerInGameDisplays');
 
     const inGameDisplayInfoSubmitted = () => {
-        currentUser.enteredDisplayName = displayName;
-        currentUser.enteredDisplayBuyIn = buyIn;
+        setInitEnterGame(true)
 
         user.socket.emit('playerSubmitsInGameDisplayInfo', currentUser)
     }
@@ -43,9 +40,9 @@ const PlayerInGameDisplays = ({route}) => {
 
     // User Socket On's //
 
-    user.socket.on('sendingUserToGamePage', (roomId, gameObj) => {
+    user.socket.on('sendingUserToGamePage', (roomId, gameObj, obj) => {
         user.inGame = true;
-        user.playerGameObj = new Player(currentUser.enteredDisplayName, Number(currentUser.enteredDisplayBuyIn), null, 0, false, roomId, user.socket);
+        user.playerGameObj = new Player(obj.enteredDisplayName, Number(obj.enteredDisplayBuyIn), null, 0, false, roomId, user.socket);
         navigation.navigate('GamePage', {
             paramKey: user,
             gameKey: gameObj,
@@ -61,8 +58,8 @@ const PlayerInGameDisplays = ({route}) => {
             <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 150, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
                 <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Display Name</Text>
                 <TextInput 
-                    value={displayName}
-                    onChangeText={(v) => setDisplayName(v)}
+                    value={displayNameHolder}
+                    onChangeText={(v) => currentUser.enteredDisplayName = v}
                     style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
                     placeholder='enter here'
                     onSubmitEditing={() => buyInRef.current.focus()}
@@ -71,8 +68,8 @@ const PlayerInGameDisplays = ({route}) => {
             <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 325, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
                 <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Buy-In</Text>
                 <TextInput 
-                    value={buyIn}
-                    onChangeText={(v) => setBuyIn(v)}
+                    value={buyInHolder}
+                    onChangeText={(v) => currentUser.enteredDisplayBuyIn = v}
                     style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
                     placeholder='enter here'
                     ref={buyInRef}
@@ -93,6 +90,10 @@ const PlayerInGameDisplays = ({route}) => {
                         paramKey: user
                     })}
                 />
+            </View>
+            <View style={{display: initEnterGame === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', top: 270, flex: 1, justifyContent: 'center'}}>
+                <ActivityIndicator size='large' color='lightcoral' />
+                <Text style={{textAlign: 'center'}}>Loading Game State...</Text>
             </View>
         </View>
     )

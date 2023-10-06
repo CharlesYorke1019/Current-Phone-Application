@@ -23,18 +23,22 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
 
     // Functions //
 
-    const xOutOfResponse = () => {
-        if (responseType === 200) {
+    const xOutOfWindow = () => {
+        if (readyResponse) {
+            if (responseType === 200) {
+                setterAddingFriendInit(false);
+                usernameRef.current.clear();
+                setReadyResponse(false)
+            } else if (responseType === 400) {
+                setReadyResponse(false)
+            }
+        } else {
             setterAddingFriendInit(false);
-            setReadyResponse(false)
-        } else if (responseType === 400) {
-            setReadyResponse(false);
-        }
-    }
 
-    const xOutOfPageNoEntry = () => {
-        setterAddingFriendInit(false)
-        usernameRef.current.clear();
+            if (submittedFriendUsername != null) {
+                usernameRef.current.clear();
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////
@@ -62,14 +66,14 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip'}}>
-            <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
-                <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -205, width: '100%'}}>
-                    <Button 
-                        title='X'
-                        onPress={() => xOutOfPageNoEntry()}
-                        color='black'
-                    />
-                </View>
+            <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', width: '100%', position: 'absolute', top: 0}}>
+                <Button 
+                    title='X'
+                    onPress={() => xOutOfWindow()}
+                    color='black'
+                />
+            </View>
+            <View style={{display: readyResponse === false ? 'flex' : 'none',  height: '50%', width: '80%', justifyContent: 'center', marginTop: '60%'}}>
                 <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130}}>Enter Username Of Friend You Want To Add</Text>
                 <TextInput 
                     value={friendUsernameHolder}
@@ -89,13 +93,6 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
 
             <View style={{display: readyResponse === true ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={{textAlign: 'center'}}>{responseText}</Text>
-                <View style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: -190, width: '100%'}}>
-                    <Button 
-                        title='X'
-                        onPress={() => xOutOfResponse()}
-                        color='black'
-                    />
-                </View>
             </View>
             
         </View>

@@ -49,6 +49,7 @@ const JoinGame = ({route}) => {
                             value={gameCodeHolder}
                             onChangeText={(gameCode) => enteredGameCode = gameCode}
                             style={styles.inputStyle}
+                            placeholder='enter here'
                         />
                 </View>
                 <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%', alignSelf: 'center', marginBottom: 40}}>
