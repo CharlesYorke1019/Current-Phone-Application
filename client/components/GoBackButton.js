@@ -7,7 +7,7 @@ const GoBackButton = ({user, gameObj}) => {
 
 
     return (
-        <View style={{backgroundColor:'lightgrey', position: 'absolute', top: 50, borderWidth: 3, borderRadius: 5, borderColor: 'black'}}>
+        <View style={{backgroundColor:'lightgrey', position: 'absolute', top: 55, borderWidth: 3, borderRadius: 5, borderColor: 'black'}}>
             <Button 
                 title='Back'
                 onPress={() => navigation.navigate(`${user.currentPage}`, {
