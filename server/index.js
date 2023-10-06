@@ -60,36 +60,19 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('userLogsIn', (loggedInAccount, method) => {
+    socket.on('userLogsIn', (loggedInAccount) => {
 
-        if (method === 'via_email') {
-            for (var key in possibleAccounts) {
-                if (possibleAccounts[key].email === loggedInAccount.username) {
-                    if (possibleAccounts[key].password === loggedInAccount.password) {
-                        possibleAccounts[key].idHolder = userBEI.id;
-                        possibleAccounts[key].loggedIn = true;
-                        userBEI.accountUsername = possibleAccounts[key].username
-                        socket.emit('logInSuccessful', possibleAccounts[key])
-                    } else {
-                        socket.emit('logInFailed')
-                    }
-                } else {
-                    socket.emit('logInFailed')
-                }
-            }
-        } else if (method === 'via_username') {
-            if (possibleAccounts[loggedInAccount.username]) {
-                if (loggedInAccount.password === possibleAccounts[loggedInAccount.username].password) {
-                    possibleAccounts[loggedInAccount.username].idHolder = userBEI.id;
-                    possibleAccounts[loggedInAccount.username].loggedIn = true;
-                    userBEI.accountUsername = loggedInAccount.username
-                    socket.emit('logInSuccessful', possibleAccounts[loggedInAccount.username])
-                } else {
-                    socket.emit('logInFailed')
-                }
+        if (possibleAccounts[loggedInAccount.username]) {
+            if (loggedInAccount.password === possibleAccounts[loggedInAccount.username].password) {
+                possibleAccounts[loggedInAccount.username].idHolder = userBEI.id;
+                possibleAccounts[loggedInAccount.username].loggedIn = true;
+                userBEI.accountUsername = loggedInAccount.username
+                socket.emit('logInSuccessful', possibleAccounts[loggedInAccount.username])
             } else {
                 socket.emit('logInFailed')
             }
+        } else {
+            socket.emit('logInFailed')
         }
     }) 
 
@@ -206,7 +189,11 @@ io.on('connection', (socket) => {
     })
 
     socket.on('startingGameWithGroup', (groupPlayersArr) => {
-        console.log(groupPlayersArr);
+        for (let i = 0; i < groupPlayersArr.length; i++) {
+            io.to(possibleAccounts[groupPlayersArr[i]].idHolder).emit('gameStartedWithGroup');
+        }
+
+        socket.emit('gameThroughGroupConfirmed', groupPlayersArr);
     })
 
     // Other Listeners //
@@ -236,11 +223,13 @@ io.on('connection', (socket) => {
 
     // Pre Game Listeners //
 
-    socket.on('newGame', (rS, ante, timer, progressiveBlinds, gameStyle, bbMinRange, bbMaxRange, chipUnits) => {
+    socket.on('newGame', (rS, ante, timer, progressiveBlinds, gameStyle, bbMinRange, bbMaxRange, chipUnits, t1, t2) => {
         var roomName
         if (rS === 0 && ante === 0) {
             console.log('hi');
         } else if (rS != 0 && ante != 0) {
+
+            socket.emit('gameStateCreated');
 
             roomName = makeId(5);
 
@@ -252,8 +241,10 @@ io.on('connection', (socket) => {
                 active: true,
                 players: [],
                 idHolder: roomName,
+                hostId: userBEI.id,
                 pNickNames: [],
                 pChips: [],
+                totalBuyIns: [],
                 gameStarted: false,
                 updatedPChips: [],
                 desiredRoomSize: rS,
@@ -264,12 +255,16 @@ io.on('connection', (socket) => {
                 minBuyIn: (bbMinRange * ante),
                 maxBuyIn: (bbMaxRange * ante),
                 chipUnits: chipUnits,
+                throughGroup: false,
+                groupMembersInvited: null
             };
 
+            if (t1 === 'group_game') {
+                gameSettingsObj.throughGroup = true;
+                gameSettingsObj.groupMembersInvited = t2;
+            }
+
             globalState[roomName.toString()] = gameSettingsObj;
-
-            socket.emit('gameStateCreated');
-
         }
     })
 
@@ -288,14 +283,23 @@ io.on('connection', (socket) => {
             globalState[userBEI.roomLabel].pNickNames.push(displayObj.enteredDisplayName)
             globalState[userBEI.roomLabel].pChips.push(Number(displayObj.enteredDisplayBuyIn))
             globalState[userBEI.roomLabel].players.push(userBEI.id)
+            globalState[userBEI.roomLabel].totalBuyIns.push(Number(displayObj.enteredDisplayBuyIn))
 
-            io.to(userBEI.roomLabel).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel]);
+            io.to(userBEI.roomLabel).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel], displayObj);
+
+            if (globalState[userBEI.roomLabel].throughGroup) {
+                let newAlert = {'type': 'game_invite', 'sender': userBEI.accountUsername, 'gameCode': userBEI.roomLabel};
+                for (let i = 0; i < globalState[userBEI.roomLabel].groupMembersInvited.length; i++) {
+                    io.to(possibleAccounts[globalState[userBEI.roomLabel].groupMembersInvited[i]].idHolder).emit('sendingGroupGameInvite', newAlert);
+                }
+            }
+
         }
     })
 
     socket.on('initGameStarted', (info, info2) => {
         io.to(userBEI.roomLabel).emit('sendingBackGameStart', info)
-    })    
+    })   
 
     // In Game Listeners //
 
@@ -309,16 +313,34 @@ io.on('connection', (socket) => {
     })
 
     socket.on('userLeavesGame', (turn) => {
-        globalState[userBEI.roomLabel].players[turn - 1] = '';
-        globalState[userBEI.roomLabel].pNickNames[turn - 1] = '';
-        globalState[userBEI.roomLabel].pChips[turn - 1] = '';
+        // globalState[userBEI.roomLabel].players[turn - 1] = '';
+        // globalState[userBEI.roomLabel].pNickNames[turn - 1] = '';
+        // globalState[userBEI.roomLabel].pChips[turn - 1] = '';
+
+        globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
+        globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
+        globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
+
 
         io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
 
+        if (globalState[userBEI.roomLabel].active) {
+            if (globalState[userBEI.roomLabel].players.length === 0) {
+                // console.log('Game Empty Deleting Room: ')
+                // console.log(globalState[userBEI.roomLabel]);
+                delete globalState[userBEI.roomLabel]   
+            }
+        }
+
+        // console.log('Global State current state: ')
+        // console.log(globalState);
+
+        socket.leave(userBEI.roomLabel)
         userBEI.roomLabel = null;
     })
 
     socket.on('roomSizeChanged', (newRS) => {
+
         globalState[userBEI.roomLabel].desiredRoomSize = newRS;
 
         io.to(userBEI.roomLabel).emit('sendingBackRSChange', newRS)
