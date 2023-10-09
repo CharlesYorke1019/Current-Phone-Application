@@ -346,6 +346,13 @@ io.on('connection', (socket) => {
         io.to(userBEI.roomLabel).emit('sendingBackRSChange', newRS)
     })
 
+    socket.on('playerAddsOn', (turn, amount, totalChips) => {
+        globalState[userBEI.roomLabel].pChips[turn - 1] = totalChips;
+        globalState[userBEI.roomLabel].totalBuyIns[turn - 1] += amount;
+
+        io.to(userBEI.roomLabel).emit('sendingBackAddOn', turn, totalChips, globalState[userBEI.roomLabel].totalBuyIns[turn - 1]);
+    })
+
     // PLAYER IN GAME LISTENERS //
 
     socket.on('pSubmitsBet', (turn, betAmount, playerChips) => {
