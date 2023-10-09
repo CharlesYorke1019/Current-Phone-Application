@@ -28,7 +28,8 @@ function App() {
 
   return (
     <Stack.Navigator screenOptions={{
-      headerShown: false
+      headerShown: false,
+      gestureEnabled: false
     }}>
       <Stack.Screen name='Home' component={Home} />
       <Stack.Screen name="CreateGame" component={CreateGame} />
