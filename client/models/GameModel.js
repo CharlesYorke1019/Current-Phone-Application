@@ -152,6 +152,10 @@ class GameModel {
         state.pChips[pTurn - 1] = info;
     }
 
+    setTotalBuyIns(state, info, pTurn) {
+        state.totalBuyIns[pTurn - 1] = info;
+    }
+
     setNextTurn(lastTurn, action) {
         for (let i = 0; i < this.gameArray.length; i++) {
             let j = 0;

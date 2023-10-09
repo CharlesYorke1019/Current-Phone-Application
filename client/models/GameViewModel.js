@@ -27,6 +27,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     let [gameInfoDisplay, setGameInfoDisplay] = useState(false)
     let [inGameMenuActive, setInGameMenuActive] = useState(false);
+    let [menuButton, setMenuButton] = useState(true)
     let [roundTransition, setRoundTransition] = useState(false);
     let [selectedWinner, setSelectedWinner] = useState(0);
     let [winnerChosen, setWinnerChosen] = useState(false);
@@ -47,9 +48,14 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     let [activePot, setActivePot] = useState();
     let [activeRound, setActiveRound] = useState();
     let [gameTurn, setGameTurn] = useState();
+    let [addOnWindow, setAddOnWindow] = useState(false);
+    let [restrictionAddOn, setRestrictionAddOn] = useState(false);
 
     let usernameInviting = null;
     let usernameInvitingHolder;
+
+    let addOnAmount = null;
+    let addOnHolder;
 
     let usernameRef = useRef();
 
@@ -112,6 +118,10 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             setInitInvitingPlayer(false);
             setRestrictionInvitingPlayers(false);
             setInGameMenuActive(true);
+
+            if (usernameInviting != null) {
+                usernameRef.current.clear();
+            }
         }
     }
 
@@ -120,15 +130,13 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         navigation.navigate('Home');
     }
 
-    const userInitsRSChange = () => {
-        setChangeRS(true);
-        setInGameMenuActive(false);
-    }
+    const toggleRoomSizeChangeWindow = () => {
+        setChangeRS(!changeRS);
+        setInGameMenuActive(!inGameMenuActive);
 
-    const userXsOutOfRSChange = () => {
-        setChangeRS(false);
-        setInGameMenuActive(true);
-        setChangeRSOptions(0);
+        if (changeRSOptions != 0) {
+            setChangeRSOptions(0);
+        }
     }
 
     const roomSizeChangeSubmitted = () => {
@@ -136,15 +144,31 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         setChangeRS(false)
     }
 
-    const displayGameInfo = () => {
-        setInGameMenuActive(false)
-        setGameInfoDisplay(true);
+    const toggleGameInfoWindow = () => {
+        setInGameMenuActive(!inGameMenuActive);
+        setGameInfoDisplay(!gameInfoDisplay);
     }
 
-    const xOutOfGameInfoWindow = () => {
-        setInGameMenuActive(true)
-        setGameInfoDisplay(false);
+    const toggleAddOnWindow = () => {
+        setInGameMenuActive(!inGameMenuActive);
+        setAddOnWindow(!addOnWindow);
+
+        if (gameStarted) {
+            setRestrictionReason('Please Wait Until The Current Round Is Over To Add-On.')
+            setRestrictionAddOn(true);
+        }
+
+        if (readyResponse) {
+            setReadyResponse(false);
+            setResponseText('');
+        }
     }
+
+    const toggleInGameMenu = () => {
+        setMenuButton(!menuButton);
+        setInGameMenuActive(!inGameMenuActive);
+    }
+
 
     //////////////////////////////////////////////////////////////////
 
@@ -162,20 +186,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         setActiveRound(gModel.currentRoundName)
 
         user.playerGameObj.setInGameInfo(gModel)
-
-        // if (gModel.bigBlind === user.playerGameObj.turn) {
-        //     gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - gModel.ante), user.playerGameObj.turn);
-
-        //     // CAUSING TYPERROR WITH SETTERCHIPS
-        //     // user.playerGameObj.displayChipsAnte(gModel.ante, 'bb');
-        // }
-
-        // if (gModel.smallBlind === user.playerGameObj.turn) {
-        //     gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - (gModel.ante / 2)), user.playerGameObj.turn)
-
-        //     // CAUSING TYPERROR WITH SETTERCHIPS
-        //     // user.playerGameObj.displayChipsAnte(gModel.ante, 'sb')
-        // }
 
     })
 
@@ -296,6 +306,21 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         }
     })
 
+    user.socket.on('sendingBackAddOn', (turn, totalChips, totalBuyIn) => {
+
+        if (gameStarted) {
+            gModel.setPlayerBorders(gameState, totalChips, turn);
+            gModel.setTotalBuyIns(gameState, totalBuyIn, turn)
+        } else {
+            gameState.pChips[turn - 1] = totalChips;
+            gameState.totalBuyIns[turn - 1] = totalBuyIn;
+        }
+        
+        user.playerGameObj.setChips(totalChips);
+        setResponseText('Chips Have Been Added On!');
+        setReadyResponse(true);
+    })
+
     //////////////////////////////////////////////////////////////////
 
     // In Game Elements //
@@ -317,47 +342,53 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const InGameMenuButton = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', display: inGameMenuActive === false && playerView === true ? 'flex' : 'none', position: 'absolute', left: -110, top: 200, height: 60, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: -110, top: '25%', height: 60, alignItems: 'center', justifyContent: 'center'}}>
             <Button 
                 title='>'
                 color='black'
-                onPress={() => setInGameMenuActive(true)}
+                onPress={() => toggleInGameMenu()}
             />
         </View>
     )
 
     const InGameMenu = (
-        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '50%', height: '50%', left: -110, top: 200, display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
-            <View style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
+        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '50%', height: '50%', left: -110, top: '25%', display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
+            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
                 <Button 
                     title='<'
                     color='black'
-                    onPress={() => setInGameMenuActive(false)}
+                    onPress={() => toggleInGameMenu()}
                 />
             </View>
             <Text style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', alignSelf: 'center', top: 60, marginRight: 10, marginLeft: 10}}>Game Code: {gameState.idHolder}</Text>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: 150, alignSelf: 'center'}}
-                onPress={() => displayGameInfo()}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '30%', alignSelf: 'center'}}
+                onPress={() => toggleGameInfoWindow()}
             >
                 <Text style={{textAlign: 'center', fontSize: 18, marginRight: 10, marginLeft: 10}}>Game Info</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: 200, alignSelf: 'center'}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '45%', alignSelf: 'center'}}
+                onPress={() => toggleAddOnWindow()}
+            >
+                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 10, marginLeft: 10}}>Add-On</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '60%', alignSelf: 'center'}}
                 onPress={() => userInivitingPlayerToGame()}
             >
                 <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Invite Players</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: 250, alignSelf: 'center', display: gameState.hostId === user.socket.id ? 'flex' : 'none'}}
-                onPress={() => userInitsRSChange()}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '75%', alignSelf: 'center', display: gameState.hostId === user.socket.id ? 'flex' : 'none'}}
+                onPress={() => toggleRoomSizeChangeWindow()}
             >
                 <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Change Game Size</Text>
             </TouchableOpacity>
 
 
             {/* WILL GO AT BOTTOM OF MENU SO LEAVING SPACE FOR OTHER ELEMENTS */}
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', marginTop: 300}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: '90%'}}
                 onPress={() => setInitLeaveGame(true)}
             >
                 <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Leave Game</Text>
@@ -515,7 +546,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     let InvitingUserToGameWindow = (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', justifyContent: 'center', width: '85%', height: '35%', display: initInvitingPlayer === true ? 'flex' : 'none', position: 'absolute'}}>
-            <View style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
+            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
                     <Button 
                         title='X'
                         color='black'
@@ -565,7 +596,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                     <Button 
                         title='X'
                         color='black'
-                        onPress={() => userXsOutOfRSChange()}
+                        onPress={() => toggleRoomSizeChangeWindow()}
                     />
             </View>
 
@@ -654,7 +685,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                 <Button 
                     title='X'
                     color='black'
-                    onPress={() => xOutOfGameInfoWindow()}
+                    onPress={() => toggleGameInfoWindow()}
                 />
             </View>
 
@@ -664,6 +695,50 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             </View>
             
 
+        </View>
+    )
+
+    let AddOnWindow = (
+        <View style={{width: '85%', height: '35%', alignSelf: 'center', justifyContent: 'center', position: 'absolute', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', display: addOnWindow === true ? 'flex' : 'none', flex: 1}}>
+            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '100%', position: 'absolute', top: 0}}>
+                <Button 
+                    title='X'
+                    color='black'
+                    onPress={() => toggleAddOnWindow()}
+                />
+            </View>
+            <View style={{display: restrictionAddOn === false ? 'flex' : 'none', alignItems: 'center', position: 'absolute', top: '20%', width: '100%'}}>
+                <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
+                    <View style={{marginBottom: '20%', alignItems: 'center'}}>
+                        <Text style={{textAlign: 'center', fontSize: 26}}>Enter Add-On</Text>
+                    </View>
+                    
+                    <View style={{width: '100%', alignSelf: 'center', marginBottom: '18%'}}>
+                        <TextInput 
+                            value={addOnHolder}
+                            onChangeText={(v) => addOnAmount = v}
+                            keyboardType='numeric'
+                            style={styles.inputStyle}
+                            placeholder='enter here'
+                        />
+                    </View>
+                    <View style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center'}}>
+                        <Button 
+                            title='Submit'
+                            color='black'
+                            onPress={() => user.playerGameObj.reBuys(Number(addOnAmount))}
+                        />
+                    </View>
+                </View>
+
+                <View style={{display: readyResponse === true ? 'flex' : 'none', width: '80%'}}>
+                    <Text style={{textAlign: 'center', fontSize: 18}}>{responseText}</Text>
+                </View>
+            </View>
+
+            <View style={{display: restrictionAddOn === true ? 'flex' : 'none'}}>
+                <Text style={{textAlign: 'center', fontSize: 18}}>{restrictionReason}</Text>
+            </View>
         </View>
     )
 
@@ -687,6 +762,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             {RestrictedInvitingPlayersWindow}
             {ChangeGameSizeWindow}
             {GameInfoWindow}
+            {AddOnWindow}
         </View>
     )
 

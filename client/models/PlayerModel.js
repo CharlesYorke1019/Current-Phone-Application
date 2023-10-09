@@ -18,6 +18,7 @@ class Player {
     tapCount = 0;
     setterTapCount;
     setterInitCheck;
+    chipsDistr;
 
     constructor(displayName, chips, turn, betAmount, folded, roomId, socket) {
         this.displayName = displayName;
@@ -120,6 +121,20 @@ class Player {
         this.currentGameAnte = gameModel.ante;
         this.currentGameBettor = gameModel.currentBettor;
         this.currentGameRound = gameModel.currentRound;
+    }
+
+    clearsBet() {
+        this.betAmount = 0;
+        this.setterBetAmount(this.betAmount)
+    }
+
+    reBuys(amount) {
+        this.chips += amount;
+        this.socket.emit('playerAddsOn', this.turn, amount, this.chips);
+    }
+
+    setChips(c) {
+        this.chips = c;
     }
 
 }

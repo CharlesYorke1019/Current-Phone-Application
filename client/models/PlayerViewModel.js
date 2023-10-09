@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Draggable from 'react-native-draggable';
 
 
-export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}) => {
+export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView, chips}) => {
 
     // Variables //
 
@@ -13,7 +13,8 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}
     let [playerBetAmount, setPlayerBetAmount] = useState(user.playerGameObj.betAmount)
     
     user.playerGameObj.setterChips = setPlayerChips;
-    user.playerGameObj.setterBetAmount = setPlayerBetAmount;
+    user.playerGameObj.setterBetAmount = setPlayerBetAmount;    
+    
 
     //////////////////////////////////////////////////////////////////
 
@@ -35,7 +36,7 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}
                     <Button 
                         title='Clear Bets'
                         color='black'
-                        onPress={() => setPlayerBetAmount(0)}
+                        onPress={() => user.playerGameObj.clearsBet()}
                     />
                 </View>
 
@@ -81,24 +82,24 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView}
             </View>
 
             <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', position: 'absolute', top: '77%', width: '100%', height: '10%'}}>
-                <Draggable x={10} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 0.25)} shouldReverse={true}>  
+                <Draggable x={10} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.smallest)} shouldReverse={true}>  
                     <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 15}}>.25</Text>
+                        <Text style={{fontSize: 15}}>{chips.smallest}</Text>
                     </View>
                 </Draggable>
-                <Draggable x={100} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 0.50)} shouldReverse={true}>  
+                <Draggable x={100} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondSmallest)} shouldReverse={true}>  
                     <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'red', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 15}}>.50</Text>
+                        <Text style={{fontSize: 15}}>{chips.secondSmallest}</Text>
                     </View>
                 </Draggable>
-                <Draggable x={190} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 1)} shouldReverse={true}>  
+                <Draggable x={190} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondLargest)} shouldReverse={true}>  
                     <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'lightblue', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 15}}>1</Text>
+                        <Text style={{fontSize: 15}}>{chips.secondLargest}</Text>
                     </View>
                 </Draggable>
-                <Draggable x={280} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, 5)} shouldReverse={true}>  
+                <Draggable x={280} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.largest)} shouldReverse={true}>  
                     <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'green', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 15}}>5</Text>
+                        <Text style={{fontSize: 15}}>{chips.largest}</Text>
                     </View>
                 </Draggable>
             </View>
