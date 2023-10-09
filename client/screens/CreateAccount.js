@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -85,82 +85,83 @@ const CreateAccount = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={styles.background}>
+        <TouchableWithoutFeedback
+            onPress={() => Keyboard.dismiss()}
+        >
+            <View style={styles.background}>
+                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
+                        <Button 
+                            title='<'
+                            color='black'
+                            onPress={() => navigation.navigate('Profile', {
+                                paramKey: user
+                            })}
+                        />
+                </View>
 
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
-                    <Button 
-                        title='<'
-                        color='black'
-                        onPress={() => navigation.navigate('Profile', {
-                            paramKey: user
-                        })}
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', marginBottom: 300, position: 'absolute', top: 100}}>
+                    <Text style={{fontSize: 30, textAlign: 'center'}}>Create Account</Text>
+                </View>
+
+                <View style={{width: '100%', marginTop: -200}}>
+                    <TextInput
+                        value={usernameInput}
+                        onChangeText={(username) => caUser.chosenUN = username}
+                        onSubmitEditing={() => passwordRef.current.focus()}
+                        style={styles.inputStyle}
+                        placeholder='Username'
+                        ref={usernameRef}
                     />
+                    <TextInput 
+                        value={passwordInput}
+                        onChangeText={(password) => caUser.chosenP = password}
+                        onSubmitEditing={() => confirmPasswordRef.current.focus()}
+                        style={styles.inputStyle}
+                        placeholder='Password'
+                        ref={passwordRef}
+                        secureTextEntry={!showPassword}
+                    />
+
+                    <MaterialCommunityIcons
+                        name={showPassword ? 'eye-off' : 'eye'}
+                        size={24}
+                        color="#aaa"
+                        style={{position: 'absolute', top: 130, left: '90%'}}
+                        onPress={() => togglePassword()}
+                    />
+
+                    <TextInput 
+                        value={confirmPasswordInput}
+                        onChangeText={(password) => caUser.confirmChosenP = password}
+                        style={styles.inputStyle}
+                        placeholder='Confirm Password'
+                        ref={confirmPasswordRef}
+                        secureTextEntry={!showCPassword}
+                    />
+
+                    <MaterialCommunityIcons
+                        name={showCPassword ? 'eye-off' : 'eye'}
+                        size={24}
+                        color="#aaa"
+                        style={{position: 'absolute', top: 215, left: '90%'}}
+                        onPress={() => toggleCPassword()}
+                    />
+
+                </View>
+
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                    <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
+                </View>
+
+                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 500}}>
+                    <Button 
+                        title = 'Create Account'
+                        onPress={() => sendingCreateAccount2Server()}
+                        color='black'
+                    />
+                </View>
             </View>
-
-            <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', marginBottom: 300, position: 'absolute', top: 100}}>
-                <Text style={{fontSize: 30, textAlign: 'center'}}>Create Account</Text>
-            </View>
-
-            <View style={{width: '100%', marginTop: -200}}>
-                <TextInput
-                    value={usernameInput}
-                    onChangeText={(username) => caUser.chosenUN = username}
-                    onSubmitEditing={() => passwordRef.current.focus()}
-                    style={styles.inputStyle}
-                    placeholder='Username'
-                    ref={usernameRef}
-                />
-                <TextInput 
-                    value={passwordInput}
-                    onChangeText={(password) => caUser.chosenP = password}
-                    onSubmitEditing={() => confirmPasswordRef.current.focus()}
-                    style={styles.inputStyle}
-                    placeholder='Password'
-                    ref={passwordRef}
-                    secureTextEntry={!showPassword}
-                />
-
-                <MaterialCommunityIcons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color="#aaa"
-                    style={{position: 'absolute', top: 130, left: '90%'}}
-                    onPress={() => togglePassword()}
-                />
-
-                <TextInput 
-                    value={confirmPasswordInput}
-                    onChangeText={(password) => caUser.confirmChosenP = password}
-                    style={styles.inputStyle}
-                    placeholder='Confirm Password'
-                    ref={confirmPasswordRef}
-                    secureTextEntry={!showCPassword}
-                />
-
-                <MaterialCommunityIcons
-                    name={showCPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color="#aaa"
-                    style={{position: 'absolute', top: 215, left: '90%'}}
-                    onPress={() => toggleCPassword()}
-                />
-
-            </View>
-
-            <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
-                <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
-            </View>
-
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 500}}>
-                <Button 
-                    title = 'Create Account'
-                    onPress={() => sendingCreateAccount2Server()}
-                    color='black'
-                />
-            </View>
-
-
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 

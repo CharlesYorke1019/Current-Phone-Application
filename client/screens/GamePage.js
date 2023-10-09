@@ -1,8 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { PlayerGameView } from '../Models/PlayerViewModel';
 import { GameViewModel } from '../Models/GameViewModel';
+import ChipIncrements from '../Models/ChipIncrements';
 
 const GamePage = ({route}) => {
 
@@ -21,6 +22,8 @@ const GamePage = ({route}) => {
     let PGameView;
 
     let GModle;
+
+    let chips = new ChipIncrements(Number(sentGameObj.ante), 0, 0, 0);
 
     //////////////////////////////////////////////////////////////////
 
@@ -43,18 +46,23 @@ const GamePage = ({route}) => {
     )
 
     if (gameStarted) {
+        chips.initChips();
         PGameView = (
-            <PlayerGameView userObj={user} gameStarted={gameStarted} playerView={tableView} setPlayerView={setTableView} />
+            <PlayerGameView userObj={user} gameStarted={gameStarted} playerView={tableView} setPlayerView={setTableView} chips={chips} />
         )
     }
 
     //////////////////////////////////////////////////////////////////
     
     return (
+        <TouchableWithoutFeedback
+            onPress={() => Keyboard.dismiss()}
+        >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             {GModle}
             {PGameView}
         </View>
+        </TouchableWithoutFeedback>
     )
 
 }

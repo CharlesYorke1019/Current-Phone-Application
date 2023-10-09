@@ -189,6 +189,7 @@ const CreateGame = ({route}) => {
                         onChangeText={(anteInput) => setAnte(Number(anteInput))}
                         onEndEditing={() => relativeChipUnits()}
                         style={{backgroundColor: 'lightgrey', borderWidth: 2, borderRadius: 5, borderColor: 'black', textAlign: 'center', height: 25}}
+                        keyboardType='numeric'
                     />
                 </View>
 

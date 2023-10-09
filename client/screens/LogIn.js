@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -84,62 +84,68 @@ const LogIn = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
-                <Button 
-                    title='<'
-                    color='black'
-                    onPress={() => navigation.navigate('Profile', {
-                        paramKey: user
-                    })}
-                />
+        <TouchableWithoutFeedback
+            onPress={() => Keyboard.dismiss()}
+        >
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
+                    <Button 
+                        title='<'
+                        color='black'
+                        onPress={() => navigation.navigate('Profile', {
+                            paramKey: user
+                        })}
+                    />
+                </View>
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 100}}>
+                    <Text style={{fontSize: 30, textAlign: 'center'}}>Log In!</Text>
+                </View>
+
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                    <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
+                </View>
+
+                <View style={{width: '100%', marginTop: -300}}>
+
+                    <TextInput 
+                        value={usernameInput}
+                        onChangeText={(username) => liUser.username = username}
+                        onSubmitEditing={() => passwordRef.current.focus()}
+                        style={styles.inputStyle}
+                        placeholder='Username/Email'
+                        ref={usernameRef}
+                        
+                    />
+                    
+
+                    <TextInput 
+                        value={passwordInput}
+                        onChangeText={(password) => liUser.password = password}
+                        style={styles.inputStyle}
+                        placeholder='Password'
+                        ref={passwordRef}
+                        secureTextEntry={!showPassword}
+                    />
+
+                    <MaterialCommunityIcons
+                        name={showPassword ? 'eye-off' : 'eye'}
+                        size={24}
+                        color="#aaa"
+                        style={{position: 'absolute', top: 130, left: '90%'}}
+                        onPress={() => togglePassword()}
+                    />
+
+
+                </View>
+                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 400}}>
+                    <Button 
+                        title='Log In'
+                        onPress={() => userAttemptsToLogIn()}
+                        color='black'
+                    />
+                </View>
             </View>
-            <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 100}}>
-                <Text style={{fontSize: 30, textAlign: 'center'}}>Log In!</Text>
-            </View>
-
-            <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
-                <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
-            </View>
-
-            <View style={{width: '100%', marginTop: -300}}>
-
-                <TextInput 
-                    value={usernameInput}
-                    onChangeText={(username) => liUser.username = username}
-                    onSubmitEditing={() => passwordRef.current.focus()}
-                    style={styles.inputStyle}
-                    placeholder='Username/Email'
-                    ref={usernameRef}
-                />
-
-                <TextInput 
-                    value={passwordInput}
-                    onChangeText={(password) => liUser.password = password}
-                    style={styles.inputStyle}
-                    placeholder='Password'
-                    ref={passwordRef}
-                    secureTextEntry={!showPassword}
-                />
-
-                <MaterialCommunityIcons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={24}
-                    color="#aaa"
-                    style={{position: 'absolute', top: 130, left: '90%'}}
-                    onPress={() => togglePassword()}
-                />
-
-
-            </View>
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 400}}>
-                <Button 
-                    title='Log In'
-                    onPress={() => userAttemptsToLogIn()}
-                    color='black'
-                />
-            </View>
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 

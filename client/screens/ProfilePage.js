@@ -2,6 +2,7 @@ import { Button, Text, View, LogBox } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import GoBackButton from '../Components/GoBackButton';
+import { horizontalScale, verticalScale, moderateScale } from '../Models/Dimensions';
 
 const ProfilePage = ({route}) => {
 
@@ -75,7 +76,7 @@ const ProfilePage = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'space-around', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             <GoBackButton user={user} />
             {user.loggedIn ? (
                 <View style={{width: '85%', height: '70%', borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5}}>
