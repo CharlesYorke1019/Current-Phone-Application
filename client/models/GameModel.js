@@ -16,8 +16,12 @@ class GameModel {
     pDisplayNames;
     pDisplayChips;
     roundTransition = false;
+    gameStyle;
+    gameTime = 0;
+    active = true;
+    gameStarted;
 
-    constructor(gameSize, currentTurn, currentRound, currentBettor, lastBet, gameArray, bigBlind, smallBlind, pot, ante, pFoldedArr, roundSetter, roundTransitionSetter, pDisplayNames, pDisplayChips) {
+    constructor(gameSize, currentTurn, currentRound, currentBettor, lastBet, gameArray, bigBlind, smallBlind, pot, ante, pFoldedArr, roundSetter, roundTransitionSetter, pDisplayNames, pDisplayChips, gameStyle) {
         this.gameSize = gameSize
         this.currentTurn = currentTurn;
         this.currentRound = currentRound;
@@ -34,6 +38,7 @@ class GameModel {
         this.roundTransitionSetter = roundTransitionSetter;
         this.pDisplayNames = pDisplayNames;
         this.pDisplayChips = pDisplayChips;
+        this.gameStyle = gameStyle;
     }
 
     initRound(state) {
@@ -141,6 +146,19 @@ class GameModel {
             } else if (this.bigBlind === 9) {
                 this.gameArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             }
+        }
+
+        if (this.gameStyle === 'tourney') {
+            while (this.gameStarted) {
+                this.gameTime++;
+            }
+
+            if (this.gameTime >= 18000000) {
+                this.ante * 2;
+                this.gameTime = 0;
+            }
+            
+
         }
 
         this.currentTurn = this.gameArray[0];
@@ -315,6 +333,10 @@ class GameModel {
 
     updateGameSize(arg) {
         this.gameSize = arg;
+    }
+
+    setProgressiveBlinds() {
+
     }
 
 }

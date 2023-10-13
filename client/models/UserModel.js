@@ -10,6 +10,7 @@ class User {
     currentPage;
     socket;
     gameId;
+    auth;
     creatingGameMethod;
     groupMembersGameArr;
     friendRequests = [];

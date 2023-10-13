@@ -3,74 +3,74 @@ const settingPlayerPositions = (rS) => {
 
     if (rS === 2) {
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
         let p2 = {
-            pTop: 135,
-            pLeft: 38
+            pTop: '17%',
+            pLeft: '10%'
         }
 
         inGamePlayerPositions.push(p1, p2)
     } else if (rS === 3) {
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
         let p2 = {
-            pTop: 390,
-            pLeft: -60
+            pTop: '48%',
+            pLeft: '-20%'
         }
         let p3 = {
-            pTop: 390,
-            pLeft: 140
+            pTop: '48%',
+            pLeft: '40%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3)
     } else if (rS === 4) {
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
         let p2 = {
-            pTop: 390,
-            pLeft: -60
+            pTop: '48%',
+            pLeft: '-20%'
         }
         let p3 = {
-            pTop: 135,
-            pLeft: 38
+            pTop: '17%',
+            pLeft: '10%'
         }
         let p4 = {
-            pTop: 390,
-            pLeft: 140
+            pTop: '48%',
+            pLeft: '40%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3, p4)
     } else if (rS === 5) {
 
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
 
         let p2 = {
-            pTop: 470,
-            pLeft: -60
+            pTop: '57%',
+            pLeft: '-20%'
         }
 
         let p3 = {
-            pTop: 270,
-            pLeft: -60
+            pTop: '33%',
+            pLeft: '-20%'
         }
 
         let p4 = {
-            pTop: 270,
-            pLeft: 140
+            pTop: '33%',
+            pLeft: '40%'
         }
 
         let p5 = {
-            pTop: 470,
-            pLeft: 140
+            pTop: '57%',
+            pLeft: '40%'
         }
 
 
@@ -78,114 +78,114 @@ const settingPlayerPositions = (rS) => {
     } else if (rS === 6) {
 
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
 
         let p2 = {
-            pTop: 500,
-            pLeft: -60
+            pTop: '61%',
+            pLeft: '-20%'
         }
 
         let p3 = {
-            pTop: 300,
-            pLeft: -60
+            pTop: '37%',
+            pLeft: '-20%'
         }
 
         let p4 = {
-            pTop: 135,
-            pLeft: 38
+            pTop: '17%',
+            pLeft: '10%'
         }
 
         let p5 = {
-            pTop: 300,
-            pLeft: 140
+            pTop: '37%',
+            pLeft: '40%'
         }
 
         let p6 = {
-            pTop: 500,
-            pLeft: 140
+            pTop: '61%',
+            pLeft: '40%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3, p4, p5, p6)
     } else if (rS === 7) {
 
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
 
         let p2 = {
-            pTop: 500,
-            pLeft: -60
+            pTop: '61%',
+            pLeft: '-20%'
         }
 
         let p3 = {
-            pTop: 350,
-            pLeft: -60
+            pTop: '42%',
+            pLeft: '-20%'
         }
 
         let p4 = {
-            pTop: 170,
-            pLeft: -50
+            pTop: '20.5%',
+            pLeft: '-15%'
         }
 
         let p5 = {
-            pTop: 170,
-            pLeft: 130
+            pTop: '20.5%',
+            pLeft: '35%'
         }
 
         let p6 = {
-            pTop: 350,
-            pLeft: 140
+            pTop: '42%',
+            pLeft: '40%'
         }
 
         let p7 = {
-            pTop: 500,
-            pLeft: 140
+            pTop: '61%',
+            pLeft: '40%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3, p4, p5, p6, p7)
     } else if (rS === 8) {
         
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
 
         let p2 = {
-            pTop: 550,
-            pLeft: -60
+            pTop: '66%',
+            pLeft: '-20%'
         }
 
         let p3 = {
-            pTop: 400,
-            pLeft: -60
+            pTop: '48%',
+            pLeft: '-20%'
         }
 
         let p4 = {
-            pTop: 250,
-            pLeft: -60
+            pTop: '30%',
+            pLeft: '-20%'
         }
 
         let p5 = {
-            pTop: 135,
-            pLeft: 38        
+            pTop: '17%',
+            pLeft: '10%'        
         }
 
         let p6 = {
-            pTop: 250,
-            pLeft: 140
+            pTop: '30%',
+            pLeft: '40%'
         }
 
         let p7 = {
-            pTop: 400,
-            pLeft: 140
+            pTop: '48%',
+            pLeft: '40%'
         }
 
         let p8 = {
-            pTop: 550,
-            pLeft: 140
+            pTop: '66%',
+            pLeft: '40%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3, p4, p5, p6, p7, p8)
@@ -193,48 +193,48 @@ const settingPlayerPositions = (rS) => {
     } else if (rS === 9) {
         
         let p1 = {
-            pTop: 652,
-            pLeft: 38
+            pTop: '79%',
+            pLeft: '10%'
         }
 
         let p2 = {
-            pTop: 550,
-            pLeft: -60
+            pTop: '66%',
+            pLeft: '-15%'
         }
 
         let p3 = {
-            pTop: 420,
-            pLeft: -60
+            pTop: '51%',
+            pLeft: '-20%'
         }
 
         let p4 = {
-            pTop: 290,
-            pLeft: -60
+            pTop: '36%',
+            pLeft: '-15%'
         }
 
         let p5 = {
-            pTop: 155,
-            pLeft: -50
+            pTop: '19%',
+            pLeft: '-8%'
         }
 
         let p6 = {
-            pTop: 155,
-            pLeft: 130
+            pTop: '19%',
+            pLeft: '28%'
         }
 
         let p7 = {
-            pTop: 290,
-            pLeft: 140
+            pTop: '36%',
+            pLeft: '35%'
         }
 
         let p8 = {
-            pTop: 420,
-            pLeft: 140
+            pTop: '51%',
+            pLeft: '40%'
         }
 
         let p9 = {
-            pTop: 550,
-            pLeft: 140
+            pTop: '66%',
+            pLeft: '35%'
         }
 
         inGamePlayerPositions.push(p1, p2, p3, p4, p5, p6, p7, p8, p9)

@@ -58,11 +58,11 @@ class Player {
             this.chips -= arg
             this.socket.emit('pSubmitsBet', this.turn, arg, this.chips)
         }
-        this.setterBetAmount(0);
     }
 
     displayBet() {
         this.setterChips(this.chips)
+        this.setterBetAmount(0);
     }
 
     displayChipsAnte(ante, blind) {

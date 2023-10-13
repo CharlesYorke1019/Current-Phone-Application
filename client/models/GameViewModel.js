@@ -3,6 +3,8 @@ import React, { useState, useRef } from 'react';
 import GameModel from './GameModel';
 import settingPlayerPositions from './PlayerPositionsModel';
 import { useNavigation } from '@react-navigation/native'
+import style from '../Styles/style';
+
 
 var gModel;
 
@@ -142,6 +144,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     const roomSizeChangeSubmitted = () => {
         user.socket.emit('roomSizeChanged', changeRSOptions);
         setChangeRS(false)
+        setMenuButton(true)
     }
 
     const toggleGameInfoWindow = () => {
@@ -169,16 +172,17 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         setInGameMenuActive(!inGameMenuActive);
     }
 
-
     //////////////////////////////////////////////////////////////////
 
     // User Socket On's //
 
     user.socket.on('sendingBackGameStart', (info) => {
-        gModel = new GameModel(roomSize, 0, 0, 0, 0, [], info, 0, 0, Number(gameState.ante), [], setActiveRound, setRoundTransition, gameState.pNickNames, gameState.pChips)
+        gModel = new GameModel(roomSize, 0, 0, 0, 0, [], info, 0, 0, Number(gameState.ante), [], setActiveRound, setRoundTransition, gameState.pNickNames, gameState.pChips, gameState.gameStyle)
         
         setGameStart(true)
         setPlayerView(false)
+
+        gModel.gameStarted = true;
 
         gModel.initRound(gameState)
         setGameTurn(gModel.currentTurn);
@@ -186,6 +190,20 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         setActiveRound(gModel.currentRoundName)
 
         user.playerGameObj.setInGameInfo(gModel)
+
+        if (gModel.bigBlind === user.playerGameObj.turn) {
+            gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - gModel.ante), user.playerGameObj.turn);
+
+            // CAUSING TYPERROR WITH SETTERCHIPS
+            user.playerGameObj.displayChipsAnte(gModel.ante, 'bb');
+        }
+
+        if (gModel.smallBlind === user.playerGameObj.turn) {
+            gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - (gModel.ante / 2)), user.playerGameObj.turn)
+
+            // CAUSING TYPERROR WITH SETTERCHIPS
+            user.playerGameObj.displayChipsAnte(gModel.ante, 'sb')
+        }
 
     })
 
@@ -332,130 +350,124 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const StartButton = (
-        <View style={{justifyContent: 'center', position: 'absolute', borderWidth: 2, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey', display: gameStarted === false && user.playerGameObj.turn === 1 ? 'flex' : 'none'}}>
-            <Button 
-                title='Start'
-                color='black'
-                onPress={() => setToggleBBSelect(true)}
-            />
-        </View>
+        <TouchableOpacity style={{justifyContent: 'center', position: 'absolute', borderWidth: 2, borderRadius: 5, borderColor: 'black', backgroundColor: 'lavender', display: gameStarted === false && user.playerGameObj.turn === 1 ? 'flex' : 'none'}}
+            onPress={() => setToggleBBSelect(true)}
+        >
+            <Text style={{fontFamily: 'Copperplate', marginLeft: 5, marginRight: 5, fontSize: 22}}>Start</Text>
+        </TouchableOpacity>
     )
 
     const InGameMenuButton = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: -110, top: '25%', height: 60, alignItems: 'center', justifyContent: 'center'}}>
-            <Button 
-                title='>'
-                color='black'
-                onPress={() => toggleInGameMenu()}
-            />
-        </View>
+        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: -110, top: '10%', height: 60, alignItems: 'center', justifyContent: 'center'}}
+            onPress={() => toggleInGameMenu()}
+        >
+             <Text style={{fontFamily: 'Copperplate', fontSize: 32, marginRight: 5, marginLeft: 5}}>{'>'}</Text>
+        </TouchableOpacity>
     )
 
     const InGameMenu = (
-        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '50%', height: '50%', left: -110, top: '25%', display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
-            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
-                <Button 
-                    title='<'
-                    color='black'
-                    onPress={() => toggleInGameMenu()}
-                />
-            </View>
-            <Text style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', alignSelf: 'center', top: 60, marginRight: 10, marginLeft: 10}}>Game Code: {gameState.idHolder}</Text>
+        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '102%', height: '50%', left: -105, top: '10%', display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
+        
+            <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
+                onPress={() => toggleInGameMenu()}
+            >
+                <Text style={{fontFamily: 'Copperplate', fontSize: 32, textAlign: 'center'}}>{'<'}</Text>
+            </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '30%', alignSelf: 'center'}}
+            <Text style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', alignSelf: 'center', top: 60, marginRight: 10, marginLeft: 10, fontWeight: 'bold'}}>Game Code: {gameState.idHolder}</Text>
+
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', top: '30%', alignSelf: 'center'}}
                 onPress={() => toggleGameInfoWindow()}
             >
-                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 10, marginLeft: 10}}>Game Info</Text>
+                <Text style={{textAlign: 'center', fontSize: 20, marginRight: 10, marginLeft: 10, fontFamily: 'Copperplate'}}>Game Info</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '45%', alignSelf: 'center'}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top: '45%', alignSelf: 'center', display: gameState.gameStyle != 'tourney' ? 'flex' : 'none'}}
                 onPress={() => toggleAddOnWindow()}
             >
-                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 10, marginLeft: 10}}>Add-On</Text>
+                <Text style={{textAlign: 'center', fontSize: 20, marginRight: 10, marginLeft: 10, fontFamily: 'Copperplate'}}>Add-On</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '60%', alignSelf: 'center'}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top: '60%', alignSelf: 'center'}}
                 onPress={() => userInivitingPlayerToGame()}
             >
-                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Invite Players</Text>
+                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 20, fontFamily: 'Copperplate'}}>Invite Players</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top: '75%', alignSelf: 'center', display: gameState.hostId === user.socket.id ? 'flex' : 'none'}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top: '75%', alignSelf: 'center', display: gameState.hostId === user.socket.id && gameState.gameStyle != 'tourney' ? 'flex' : 'none'}}
                 onPress={() => toggleRoomSizeChangeWindow()}
             >
-                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Change Game Size</Text>
+                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 20, fontFamily: 'Copperplate'}}>Change Game Size</Text>
             </TouchableOpacity>
 
 
             {/* WILL GO AT BOTTOM OF MENU SO LEAVING SPACE FOR OTHER ELEMENTS */}
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: '90%'}}
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', position: 'absolute', top: '90%'}}
                 onPress={() => setInitLeaveGame(true)}
             >
-                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 18}}>Leave Game</Text>
+                <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 20, fontFamily: 'Copperplate'}}>Leave Game</Text>
             </TouchableOpacity>
         </View>
     )
 
     const LeaveGameConfirmation = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '85%', height: '30%', alignSelf: 'center', display: initLeaveGame === true ? 'flex' : 'none', position: 'absolute'}}>
-            <Text style={{textAlign: 'center', marginTop: 20, marginBottom: 50, fontSize: 30}}>Are You Sure You Want To Leave The Game?</Text>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '90%', height: '35%', alignSelf: 'center', display: initLeaveGame === true ? 'flex' : 'none', position: 'absolute', top: '20%'}}>
+            <Text style={{textAlign: 'center', marginTop: 35, marginBottom: 50, fontSize: 30, fontFamily: 'Copperplate'}}>Are You Sure You Want To Leave The Game?</Text>
             <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
-                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', marginRight: 20}}
+                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', marginRight: 20}}
                     onPress={() => userLeavesGame()}
                 >
-                    <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 25}}>Yes</Text>
+                    <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 25, fontFamily: 'Copperplate', lineHeight: 30}}>Yes</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey'}}
+                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender'}}
                     onPress={() => setInitLeaveGame(false)}
                 >
-                    <Text style={{textAlign: 'center', marginRight: 7, marginLeft: 7, fontSize: 25}}>No</Text>
+                    <Text style={{textAlign: 'center', marginRight: 7, marginLeft: 7, fontSize: 25, fontFamily: 'Copperplate', lineHeight: 30}}>No</Text>
                 </TouchableOpacity>
             </View>
         </View>
     )
     
     const GameInfo = (
-        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '25%', alignSelf: 'center', position: 'absolute', top: '55%', display: gameStarted === true && winnerChosen === false ? 'flex' : 'none'}}>
-            <Text style={{textAlign: 'center'}}>Pot: {activePot}</Text>
-            <Text style={{textAlign: 'center'}}>{activeRound}</Text>
+        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '25%', alignSelf: 'center', position: 'absolute', top: '55%', display: gameStarted === true && winnerChosen === false ? 'flex' : 'none'}}>
+            <Text style={{textAlign: 'center', fontFamily: 'Copperplate', marginBottom: 5}}>{activePot}</Text>
+            <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>{activeRound}</Text>
         </View>
     )
 
     for (let i = 0; i < roomSize; i++) {
         if (gameState.pNickNames[i] != undefined ) {
             PlayersDisplayName = () => 
-            <Text style={{textAlign: 'center'}}>{gameState.pNickNames[i]}</Text>;
+            <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 16}}>{gameState.pNickNames[i]}</Text>;
             PlayersDisplayChips = () => 
-            <Text style={{textAlign: 'center'}}>{gameState.pChips[i]}</Text>
+            <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>{gameState.pChips[i]}</Text>
 
             BuyInsArr.push(
-                <Text key={i} style={{textAlign: 'center'}}>{gameState.pNickNames[i]}: {gameState.totalBuyIns[i]}</Text>
+                <Text key={i} style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>{gameState.pNickNames[i]}: {gameState.totalBuyIns[i]}</Text>
             );
 
         } else {
             PlayersDisplayName = () => 
-            <Text style={{textAlign: 'center'}}>+</Text>;
+            <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>+</Text>;
             PlayersDisplayChips = () => 
             <Text style={{textAlign: 'center'}}></Text>
         }
         PlayerBorders.push(
-            <View key={i + 1} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', borderColor: toggleBBSelect === true && activeBBSelect === i + 1 ? 'blue' : gameTurn === i + 1 ? 'red' : 'black' , minWidth: 100, maxWidth: 120, top: inGamePlayerPositions[i].pTop, left: inGamePlayerPositions[i].pLeft}}>
+            <View key={i + 1} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', borderColor: toggleBBSelect === true && activeBBSelect === i + 1 ? 'blue' : gameTurn === i + 1 ? 'red' : 'black' , minWidth: 100, maxWidth: 120, top: inGamePlayerPositions[i].pTop, left: inGamePlayerPositions[i].pLeft}}>
                 <PlayersDisplayName />
                 <PlayersDisplayChips />
             </View>
         )
         BigBlindSelection.push(
-            <View key={i + 1} style={{borderWidth: 2, borderRadius: 5, backgroundColor: activeBBSelect === i + 1 ? 'lightcoral' : 'lightgrey'}}>
-                <Button 
-                    title={`p${i + 1}`}
-                    color='black'
-                    onPress={() => userSettingBigBlind(i + 1)}
-                />
-            </View>
+            <TouchableOpacity key={i + 1} style={{borderWidth: 2, borderRadius: 5, backgroundColor: activeBBSelect === i + 1 ? 'lightcoral' : 'lavender', marginRight: 5}}
+                onPress={() => userSettingBigBlind(i + 1)}
+            >
+                <Text style={{fontFamily: 'Copperplate', marginRight: 5, marginLeft: 5, fontSize: 24}}>{`p${i + 1}`}</Text>
+            </TouchableOpacity>
         )
         WinnerSelection.push(
-            <View key={i + 1} style={{borderWidth: 2, borderRadius: 5, backgroundColor: selectedWinner === i + 1 ? 'lightcoral' : 'lightgrey'}}>
+            <View key={i + 1} style={{borderWidth: 2, borderRadius: 5, backgroundColor: selectedWinner === i + 1 ? 'lightcoral' : 'lavender'}}>
                 <Button 
                     title={`p${i + 1}`}
                     color='black'
@@ -485,13 +497,11 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let beginButton = (
-        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '35%', marginTop: 10, alignSelf: 'center'}}>
-            <Button 
-                title='Begin'
-                color='black'
-                onPress={() => initGameStart()}
-            />
-        </View>
+        <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', marginTop: 10, alignSelf: 'center', marginTop: '13%'}}
+            onPress={() => initGameStart()}
+        >
+            <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 22}}>Begin</Text>
+        </TouchableOpacity>
     )
 
     let submitWinnerButton = (
@@ -515,19 +525,17 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let playerGameView = (
-        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', display: gameStarted === true && playerView === true ? 'flex' : 'none', position: 'absolute', top: 300}}>
-            <Button 
-                title='Game View'
-                color='black'
-                onPress={() => setPlayerView(false)}
-            />
-        </View>
+        <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', display: gameStarted === true && playerView === true ? 'flex' : 'none', position: 'absolute', top: 300, width: '20%'}}
+            onPress={() => setPlayerView(false)}
+        >
+            <Text style={{fontFamily: 'Copperplate', textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 22}}>Game View</Text>
+        </TouchableOpacity>
     )
 
     let BigBlindSelectionWindow = (
-        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '60%', height: '20%', position: 'absolute', display: toggleBBSelect === true ? 'flex' : 'none'}}>
-            <Text style={{fontSize: 20, textAlign: 'center', marginTop: 15, marginBottom: 10}}>Choose The Big Blind</Text>
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', minWidth: '60%', height: '20%', position: 'absolute', display: toggleBBSelect === true ? 'flex' : 'none'}}>
+            <Text style={{fontSize: 18, textAlign: 'center', marginTop: 15, marginBottom: 20, fontFamily: 'Copperplate'}}>Choose The Big Blind</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'center', marginLeft: 5}}>
                 {BigBlindSelection}
             </View>
             {beginButton}
@@ -545,16 +553,15 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let InvitingUserToGameWindow = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', justifyContent: 'center', width: '85%', height: '35%', display: initInvitingPlayer === true ? 'flex' : 'none', position: 'absolute'}}>
-            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
-                    <Button 
-                        title='X'
-                        color='black'
-                        onPress={() => userXOutInvitingPlayer()}
-                    />
-            </View>
-            <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
-                <Text style={{textAlign: 'center', fontSize: 25, position: 'absolute', alignSelf: 'center', top: -85}}>Enter Username To Invite</Text>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', width: '90%', height: '35%', display: initInvitingPlayer === true ? 'flex' : 'none', position: 'absolute', top: '20%'}}>
+            <TouchableOpacity style={style.xBttn}
+                onPress={() => userXOutInvitingPlayer()}
+            >
+                <Text style={style.xBttnFont}>X</Text>
+            </TouchableOpacity>
+
+            <View style={{display: readyResponse === false ? 'flex' : 'none', marginTop: '35%'}}>
+                <Text style={{textAlign: 'center', fontSize: 22, position: 'absolute', alignSelf: 'center', top: -85, fontFamily: 'Copperplate'}}>Enter Username To Invite</Text>
                 <TextInput 
                     value={usernameInvitingHolder}
                     onChangeText={(username) => usernameInviting = username}
@@ -562,16 +569,15 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                     placeholder='enter here'
                     ref={usernameRef}
                 />
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', width: '60%', top: 50, alignSelf: 'center'}}>
-                    <Button 
-                        title='Invite'
-                        color='black'
-                        onPress={() => user.socket.emit('invitingPlayerToGame', usernameInviting)}
-                    />
-                </View>
+                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', width: '40%', top: 50, alignSelf: 'center'}}
+                    onPress={() => user.socket.emit('invitingPlayerToGame', usernameInviting)}
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20}}>Invite</Text>
+                </TouchableOpacity>
+
             </View>
-            <View style={{display: readyResponse === true ? 'flex' : 'none'}}>
-                <Text style={{textAlign: 'center', fontSize: 20}}>{responseText}</Text>  
+            <View style={{display: readyResponse === true ? 'flex' : 'none', marginTop: '35%'}}>
+                <Text style={{textAlign: 'center', fontSize: 24, fontFamily: 'Copperplate'}}>{responseText}</Text>  
             </View>
 
         </View>
@@ -579,119 +585,99 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     let RestrictedInvitingPlayersWindow = (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', justifyContent: 'center', width: '85%', height: '35%', display: restrictionInvitingPlayers === true ? 'flex' : 'none', position: 'absolute'}}>
-            <View style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', position: 'absolute', top:-2, left: 0, width: '100%'}}>
-                    <Button 
-                        title='X'
-                        color='black'
-                        onPress={() => userXOutInvitingPlayer()}
-                    />
-            </View>
+            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
+                onPress={() => userXOutInvitingPlayer()}
+            >
+                <Text style={style.xBttnFont}>X</Text>
+            </TouchableOpacity>
+            
             <Text style={{textAlign: 'center'}}>{restrictionReason}</Text>
         </View>
     )
 
     let ChangeGameSizeWindow = (
-        <View style={{display: changeRS === true ? 'flex' : 'none', width: '85%', height: '35%', alignSelf: 'center', justifyContent: 'center', position: 'absolute', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip'}}>
-            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '100%', position: 'absolute', top: 0}}>
-                    <Button 
-                        title='X'
-                        color='black'
-                        onPress={() => toggleRoomSizeChangeWindow()}
-                    />
-            </View>
+        <View style={{display: changeRS === true ? 'flex' : 'none', width: '90%', height: '35%', alignSelf: 'center', justifyContent: 'center', position: 'absolute', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', top: '20%'}}>
+            <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', width: '100%', position: 'absolute', top: 0}}
+                onPress={() => toggleRoomSizeChangeWindow()}
+            >
+                <Text style={style.xBttnFont}>X</Text>
+            </TouchableOpacity>
 
             <View style={{display: roundTransition === true || gameStarted === false ? 'flex' : 'none'}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 50}}>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 2 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='2'
-                            onPress={() => setChangeRSOptions(2)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 3 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='3'
-                            onPress={() => setChangeRSOptions(3)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 4 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='4'
-                            onPress={() => setChangeRSOptions(4)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 5 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='5'
-                            onPress={() => setChangeRSOptions(5)}
-                            color='black'
-                        />
-                    </View>
+                <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 50, marginBottom: 10}}>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 2 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(2)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>2</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 3 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(3)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>3</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 4 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(4)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>4</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 5 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(5)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>5</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 50}}>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 6 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='6'
-                            onPress={() => setChangeRSOptions(6)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 7 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='7'
-                            onPress={() => setChangeRSOptions(7)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 8 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='8'
-                            onPress={() => setChangeRSOptions(8)}
-                            color='black'
-                        />
-                    </View>
-                    <View style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 9 ? 'lightcoral' : 'lightgrey', borderRadius: 5}}>
-                        <Button 
-                            title='9'
-                            onPress={() => setChangeRSOptions(9)}
-                            color='black'
-                        />
-                    </View>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 6 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(6)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>6</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 7 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(7)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>7</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 8 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(8)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>8</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: changeRSOptions === 9 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
+                        onPress={() => setChangeRSOptions(9)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>9</Text>
+                    </TouchableOpacity>
                 </View>
 
-                <View style={{alignContent: 'center', alignSelf: 'center', borderWidth: 2, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='Submit'
-                        color='black'
-                        onPress={() => roomSizeChangeSubmitted()} 
-                    />
-                </View>
+                <TouchableOpacity style={{alignContent: 'center', alignSelf: 'center', borderWidth: 2, borderRadius: 5, borderColor: 'black', backgroundColor: 'lavender'}}
+                    onPress={() => roomSizeChangeSubmitted()} 
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5}}>Submit</Text>
+                </TouchableOpacity>
+
 
             </View>
 
             <View style={{display: roundTransition === false && gameStarted === true ? 'flex' : 'none'}}>
-                <Text style={{textAlign: 'center'}}>You Cannot Change The Room Size Currently. Please Wait Until The Next Round Is Over.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 22}}>You Cannot Change The Room Size Currently. Please Wait Until The Next Round Is Over.</Text>
             </View>
         </View>
     )
 
     let GameInfoWindow = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', display: gameInfoDisplay === true ? 'flex' : 'none', width: '85%', height: '35%', position: 'absolute'}}>
-            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '100%', position: 'absolute', top: 0}}>
-                <Button 
-                    title='X'
-                    color='black'
-                    onPress={() => toggleGameInfoWindow()}
-                />
-            </View>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', display: gameInfoDisplay === true ? 'flex' : 'none', width: '90%', height: '35%', position: 'absolute', top: '20%'}}>
+            <TouchableOpacity style={style.xBttn}
+                onPress={() => toggleGameInfoWindow()}
+            >
+                <Text style={style.xBttnFont}>X</Text>
+            </TouchableOpacity>
 
-            <View style={{marginTop: 50}}>
-                <Text style={{textAlign: 'center'}}>Buy-Ins: </Text>
-                {BuyInsArr}
+            <View style={{marginTop: 10}}>
+                <Text style={{textAlign: 'center', fontSize: 29, marginBottom: 20, fontFamily: 'Copperplate'}}>Buy-Ins: </Text>
+                <View style={{flexDirection: 'row', flexWrap: 'wrap', alignSelf: 'center', width: '45%'}}>
+                    {BuyInsArr}
+                </View> 
             </View>
             
 
@@ -699,18 +685,17 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let AddOnWindow = (
-        <View style={{width: '85%', height: '35%', alignSelf: 'center', justifyContent: 'center', position: 'absolute', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', display: addOnWindow === true ? 'flex' : 'none', flex: 1}}>
-            <View style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '100%', position: 'absolute', top: 0}}>
-                <Button 
-                    title='X'
-                    color='black'
-                    onPress={() => toggleAddOnWindow()}
-                />
-            </View>
+        <View style={{width: '90%', height: '35%', alignSelf: 'center', position: 'absolute', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', display: addOnWindow === true ? 'flex' : 'none', flex: 1, top: '20%'}}>
+            <TouchableOpacity style={style.xBttn}
+                onPress={() => toggleAddOnWindow()}
+            >
+                <Text style={style.xBttnFont}>X</Text>
+            </TouchableOpacity>
+
             <View style={{display: restrictionAddOn === false ? 'flex' : 'none', alignItems: 'center', position: 'absolute', top: '20%', width: '100%'}}>
                 <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
-                    <View style={{marginBottom: '20%', alignItems: 'center'}}>
-                        <Text style={{textAlign: 'center', fontSize: 26}}>Enter Add-On</Text>
+                    <View style={{marginBottom: '19%', alignItems: 'center', marginTop: '2%'}}>
+                        <Text style={{textAlign: 'center', fontSize: 26, fontFamily: 'Copperplate'}}>Enter Add-On</Text>
                     </View>
                     
                     <View style={{width: '100%', alignSelf: 'center', marginBottom: '18%'}}>
@@ -722,22 +707,22 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                             placeholder='enter here'
                         />
                     </View>
-                    <View style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center'}}>
-                        <Button 
-                            title='Submit'
-                            color='black'
-                            onPress={() => user.playerGameObj.reBuys(Number(addOnAmount))}
-                        />
-                    </View>
+                    
+                    <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', width: '40%', alignSelf: 'center'}}
+                        onPress={() => user.playerGameObj.reBuys(Number(addOnAmount))}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', fontSize: 22, marginRight: 5, marginLeft: 5}}>Submit</Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 <View style={{display: readyResponse === true ? 'flex' : 'none', width: '80%'}}>
-                    <Text style={{textAlign: 'center', fontSize: 18}}>{responseText}</Text>
+                    <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>{responseText}</Text>
                 </View>
             </View>
 
             <View style={{display: restrictionAddOn === true ? 'flex' : 'none'}}>
-                <Text style={{textAlign: 'center', fontSize: 18}}>{restrictionReason}</Text>
+                <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>{restrictionReason}</Text>
             </View>
         </View>
     )
@@ -794,12 +779,13 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         marginVertical: 10,
-        backgroundColor: '#DBDBD6',
+        backgroundColor: 'lavender',
         alignSelf: 'center',
         textAlign: 'center',
         borderWidth: 2,
         position: 'absolute',
-        top: -35
+        top: -35,
+        borderRadius: 5
     },
 })
 
