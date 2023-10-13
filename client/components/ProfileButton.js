@@ -1,20 +1,19 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import { TouchableOpacity, Text } from 'react-native';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native'
+import style from '../Styles/style';
 
 const ProfileButton = ({sentU}) => {
     const navigation = useNavigation();
 
     return (
-        <View style = {{backgroundColor:'lightgrey', position: 'absolute', top: 55, left: 275, borderWidth: 3, borderRadius: 5, borderColor: 'black'}}>
-            <Button 
-                title='Profile'
-                onPress={() => navigation.navigate('Profile', {
-                    paramKey: sentU,
-                })}
-                color='black'
-            />
-        </View>
+        <TouchableOpacity style={style.profileBttn}
+            onPress={() => navigation.navigate('Profile', {
+                paramKey: sentU,
+            })}
+        >
+            <Text style={style.profileBttnText}>Profile</Text>
+        </TouchableOpacity>
     )
 }
 

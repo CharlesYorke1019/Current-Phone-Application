@@ -1,6 +1,7 @@
-import { SafeAreaView, Button, StyleSheet, Text, View, TextInput, Pressable } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native'
+import style from '../Styles/style';
 
 const GoHomeButton = ({user}) => {
     const navigation = useNavigation();
@@ -11,22 +12,13 @@ const GoHomeButton = ({user}) => {
     }
 
     return (
-        <View style={{backgroundColor:'lightgrey', position: 'absolute', top: 55, borderWidth: 3, borderRadius: 5, borderColor: 'black'}}>
-            <Button 
-                title='Home'
-                onPress={() => sendHome()}
-                color='black'
-            />
-        </View>
+        <TouchableOpacity style={style.homeBttn}
+            onPress={() => sendHome()}
+        >
+            <Text style={style.homeBttnText}>Home</Text>
+        </TouchableOpacity>
+        
     )
 }
 
 export default GoHomeButton
-
-// const styles = StyleSheet.create({
-//     buttonStyle: {
-//         position: 'absolute',
-//         top: 10
-        
-//     }
-// })
