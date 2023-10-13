@@ -1,8 +1,8 @@
-import { Button, Text, View, LogBox } from 'react-native';
+import { Button, Text, View, LogBox, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import GoBackButton from '../Components/GoBackButton';
-import { horizontalScale, verticalScale, moderateScale } from '../Models/Dimensions';
+import style from '../Styles/style';
 
 const ProfilePage = ({route}) => {
 
@@ -81,51 +81,46 @@ const ProfilePage = ({route}) => {
             {user.loggedIn ? (
                 <View style={{width: '85%', height: '70%', borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5}}>
                     <View style={{borderBottomWidth: 3, marginTop: 20, marginBottom: 50}}>
-                        <Text style={{fontSize: 25, textAlign: 'center', marginBottom: 5}}>Hello {user.accountInfo.username}</Text>
+                        <Text style={{fontSize: 30, textAlign: 'center', marginBottom: 5, fontFamily: 'Copperplate'}}>{user.accountInfo.username}</Text>
                     </View>
-                    <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 50}}>
-                        <Button 
-                            title='Proflie Info'
-                            color='black'
-                            onPress={() => navigation.navigate('ProfileInfoPage', {
-                                paramKey: user
-                            })}
-                        />
-                    </View>
-                    <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 50}}>
-                        <Button 
-                            title='Friends'
-                            color='black'
-                            onPress={() => navigation.navigate('FriendsPage', {
-                                paramKey: user
-                            })}
-                        />
-                    </View>
-                    <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 50}}>
-                        <Button 
-                            title='Groups'
-                            color='black'
-                            onPress={() => navigation.navigate('GroupsPage', {
-                                paramKey: user
-                            })}
-                        />
-                    </View>
-                    <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 50}}>
-                        <Button 
-                            title='Alerts'
-                            color='black'
-                            onPress={() => navigation.navigate('AlertsPage', {
-                                paramKey: user
-                            })}
-                        />
-                    </View>
-                    <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 50}}>
-                        <Button 
-                            title='Sign Out'
-                            color='black'
-                            onPress={() => userInitSignOut()}
-                        />
-                    </View>
+
+                    <TouchableOpacity style={style.profileInfoBttn}
+                        onPress={() => navigation.navigate('ProfileInfoPage', {
+                            paramKey: user
+                        })}
+                    >
+                        <Text style={style.profileBttnText}>Profile Info</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={style.friendsBttn}
+                        onPress={() => navigation.navigate('FriendsPage', {
+                            paramKey: user
+                        })}
+                    >
+                        <Text style={style.profileBttnText}>Friends</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={style.groupsBttn}
+                        onPress={() => navigation.navigate('GroupsPage', {
+                            paramKey: user
+                        })}
+                    >
+                        <Text style={style.profileBttnText}>Groups</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={style.alertsBttn}
+                        onPress={() => navigation.navigate('AlertsPage', {
+                            paramKey: user
+                        })}
+                    >
+                        <Text style={style.profileBttnText}>Alerts</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={style.signOutBttn}
+                        onPress={() => userInitSignOut()}
+                    >
+                        <Text style={style.profileBttnText}>Sign Out</Text>
+                    </TouchableOpacity>
 
                     <View style={{display: initSignOut === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '80%', height: '40%', top: '30%'}}>
                         <Text style={{textAlign: 'center', marginBottom: 40, fontSize: 25}}>Are You Sure You Want To Sign Out?</Text>
@@ -153,25 +148,23 @@ const ProfilePage = ({route}) => {
             ) : (
                 <View style={{position: 'absolute', top: 200, width: '100%'}}>
                     <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '100%'}}>
-                        <Text style={{fontSize: 30, textAlign: 'center', marginBottom: 50, marginTop: 40}}>You Are Not Logged In!</Text>
-                        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', marginBottom: 30}}>
-                            <Button 
-                                title = 'Create Account'
-                                color='black'
-                                onPress={() => navigation.navigate('CreateAccount', {
-                                    paramKey: user,
-                                })}
-                            />
-                        </View>
-                        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '30%', alignSelf: 'center', marginBottom: 50}}>
-                            <Button 
-                                title = 'Log In'
-                                color='black'
-                                onPress={() => navigation.navigate('LogIn', {
-                                    paramKey: user,
-                                })}
-                            />
-                        </View>
+                        <Text style={style.headerText}>You Are Not Logged In!</Text>
+                        <TouchableOpacity style={style.createAccountBttn}
+                            onPress={() => navigation.navigate('CreateAccount', {
+                                paramKey: user,
+                            })}
+                        >
+                            <Text style={style.createAccountBttnText}>Create Account</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={style.logInBttn}
+                            onPress={() => navigation.navigate('LogIn', {
+                                paramKey: user,
+                            })}
+                        >
+                            <Text style={style.logInBttnText}>Log In</Text>
+                        </TouchableOpacity>
+
 
                     </View>
                 </View>

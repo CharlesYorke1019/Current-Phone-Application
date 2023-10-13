@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ActivityIndicator, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import Player from '../Models/PlayerModel'
@@ -59,42 +59,41 @@ const PlayerInGameDisplays = ({route}) => {
                 <ProfileButton sentU={user} />
                 <GoHomeButton user={user} />
                 <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 150, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
-                    <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Display Name</Text>
+                    <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 25, marginTop: 10, fontFamily: 'Copperplate'}}>Enter Display Name</Text>
                     <TextInput 
                         value={displayNameHolder}
                         onChangeText={(v) => currentUser.enteredDisplayName = v}
-                        style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
+                        style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lavender', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
                         placeholder='enter here'
                         onSubmitEditing={() => buyInRef.current.focus()}
                     />
                 </View>
                 <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 325, justifyContent: 'center', backgroundColor: 'papayawhip'}}>
-                    <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 20, marginTop: 10}}>Enter Buy-In</Text>
+                    <Text style={{alignSelf: 'center', fontSize: 30, marginBottom: 25, marginTop: 10, fontFamily: 'Copperplate'}}>Enter Buy-In</Text>
                     <TextInput 
                         value={buyInHolder}
                         onChangeText={(v) => currentUser.enteredDisplayBuyIn = v}
-                        style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lightgrey', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
+                        style={{width: 200, textAlign: 'center', height: 35, backgroundColor: 'lavender', alignSelf: 'center', borderWidth: 3, borderRadius: 5, marginBottom: 20}}
                         placeholder='enter here'
                         ref={buyInRef}
                         keyboardType='numeric'
                     />
                 </View>
-                <View style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 550, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='Enter Game'
-                        color='black'
-                        onPress={() => inGameDisplayInfoSubmitted()}
-                    />
-                </View>
-                <View style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 630, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='Go Back'
-                        color='black'
-                        onPress={() => navigation.navigate('CreateGame', {
-                            paramKey: user
-                        })}
-                    />
-                </View>
+            
+                <TouchableOpacity style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 550, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lavender'}}
+                    onPress={() => inGameDisplayInfoSubmitted()}
+                >
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 24, marginRight: 5, marginLeft: 5}}>Enter Game</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{alignContent: 'center', alignSelf: 'center', position: 'absolute', top: 630, borderWidth: 4, borderRadius: 5, borderColor: 'black', backgroundColor: 'lavender'}}
+                    onPress={() => navigation.navigate('CreateGame', {
+                        paramKey: user
+                    })}
+                >
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 24, marginRight: 5, marginLeft: 5}}>Go Back</Text>
+                </TouchableOpacity>
+
                 <View style={{display: initEnterGame === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', top: 270, flex: 1, justifyContent: 'center'}}>
                     <ActivityIndicator size='large' color='lightcoral' />
                     <Text style={{textAlign: 'center'}}>Loading Game State...</Text>

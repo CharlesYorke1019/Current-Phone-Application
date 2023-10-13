@@ -1,7 +1,8 @@
-import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import style from '../Styles/style';
 
 const CreateAccount = ({route}) => {
 
@@ -89,7 +90,7 @@ const CreateAccount = ({route}) => {
             onPress={() => Keyboard.dismiss()}
         >
             <View style={styles.background}>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
+                <View style={style.caBackBttn}>
                         <Button 
                             title='<'
                             color='black'
@@ -100,7 +101,7 @@ const CreateAccount = ({route}) => {
                 </View>
 
                 <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', marginBottom: 300, position: 'absolute', top: 100}}>
-                    <Text style={{fontSize: 30, textAlign: 'center'}}>Create Account</Text>
+                    <Text style={{fontSize: 31, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Create Account</Text>
                 </View>
 
                 <View style={{width: '100%', marginTop: -200}}>
@@ -153,13 +154,13 @@ const CreateAccount = ({route}) => {
                     <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
                 </View>
 
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 500}}>
-                    <Button 
-                        title = 'Create Account'
-                        onPress={() => sendingCreateAccount2Server()}
-                        color='black'
-                    />
-                </View>
+                <TouchableOpacity style={style.caSubmitBttn}
+                    onPress={() => sendingCreateAccount2Server()}
+                >
+                    <Text style={style.caSubmitBttnText}>Create Account</Text>
+                </TouchableOpacity>
+                
+
             </View>
         </TouchableWithoutFeedback>
     )

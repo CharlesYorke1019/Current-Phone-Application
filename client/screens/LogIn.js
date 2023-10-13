@@ -1,7 +1,8 @@
-import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import style from '../Styles/style';
 
 const LogIn = ({route}) => {
 
@@ -63,6 +64,7 @@ const LogIn = ({route}) => {
         }   
 
         user.loggedIn = true;
+
         navigation.navigate('Profile', {
             paramKey: user,
         })
@@ -88,7 +90,7 @@ const LogIn = ({route}) => {
             onPress={() => Keyboard.dismiss()}
         >
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 100, left: 15}}>
+                <View style={style.liBackBttn}>
                     <Button 
                         title='<'
                         color='black'
@@ -98,7 +100,7 @@ const LogIn = ({route}) => {
                     />
                 </View>
                 <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 100}}>
-                    <Text style={{fontSize: 30, textAlign: 'center'}}>Log In!</Text>
+                    <Text style={{fontSize: 30, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Log In!</Text>
                 </View>
 
                 <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
@@ -137,13 +139,12 @@ const LogIn = ({route}) => {
 
 
                 </View>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '40%', alignSelf: 'center', position: 'absolute', top: 400}}>
-                    <Button 
-                        title='Log In'
-                        onPress={() => userAttemptsToLogIn()}
-                        color='black'
-                    />
-                </View>
+                <TouchableOpacity style={style.liSubmitBttn}
+                    onPress={() => userAttemptsToLogIn()}
+                >
+                    <Text style={style.liSubmitBttnText}>Log In</Text>
+                </TouchableOpacity>
+
             </View>
         </TouchableWithoutFeedback>
     )

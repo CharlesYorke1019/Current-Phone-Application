@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useRef } from 'react';
 
 
@@ -19,15 +19,23 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
 
     // Functions //
 
-    const xOutOfResponse = () => {
-        if (responseType === 200) {
-            setCreatingGroup(false)
-            setReadyResponse(false)
-        } else if (responseType === 400) {
-            setReadyResponse(false)
-        }
+    const xOutOfWindow = () => {
+        if (readyResponse) {
+            if (responseType === 200) {
+                setCreatingGroup(false)
+                setReadyResponse(false)
+            } else if (responseType === 400) {
+                setReadyResponse(false)
+            }
 
-        // groupNameRef.current.clear();
+            groupNameRef.current.clear();
+        } else {
+            setCreatingGroup(false)
+
+            if (groupName != null) {
+                groupNameRef.current.clear();
+            }
+        }
     }
 
     //////////////////////////////////////////////////////////////////
@@ -48,16 +56,14 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
     return (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', height: '35%'}}>
 
-            <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
-                <View style={{borderBottomWidth: 2, backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='x'
-                        color='black'
-                        onPress={() => setCreatingGroup(false)}
-                    />
-                </View>
+            <TouchableOpacity style={{borderBottomWidth: 2, backgroundColor: 'lavender'}}
+                onPress={() => xOutOfWindow()}
+            >
+                <Text style={{fontFamily: 'Copperplate', fontSize: 20, lineHeight: 40, textAlign: 'center'}}>X</Text>
+            </TouchableOpacity>
 
-                <Text style={{textAlign: 'center', fontSize: 25, marginTop: 10}}>Group Name</Text>
+            <View style={{display: readyResponse === false ? 'flex' : 'none'}}>
+                <Text style={{textAlign: 'center', fontSize: 29, marginTop: 15, fontFamily: 'Copperplate', marginBottom: 5}}>Group Name</Text>
                 <TextInput 
                     value={groupNameHolder}
                     onChangeText={(i) => setGroupName(i)}
@@ -66,27 +72,17 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
                     placeholder='enter here'
                 />
 
+                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '55%', alignSelf: 'center', justifyContent: 'center', alignContent: 'center', marginTop: 10}}
+                    onPress={() => user.socket.emit('groupCreated', groupName)}
+                >
+                    <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, marginRight: 5, marginLeft: 5, marginTop: 5, marginBottom: 5}}>Create Group</Text>
+                </TouchableOpacity>
 
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '50%', alignSelf: 'center'}}>
-                    <Button 
-                        title='Create Group'
-                        color='black'
-                        onPress={() => user.socket.emit('groupCreated', groupName)}
-                    />
-                </View>
             </View>
 
-            <View style={{display: readyResponse === true ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center'}}>
-                <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', width: '100%'}}>
-                    <Button 
-                        title='X'
-                        onPress={() => xOutOfResponse()}
-                        color='black'
-                    />
-                </View>
-                <Text style={{textAlign: 'center', marginTop: 80}}>{responseText}</Text>
+            <View style={{display: readyResponse === true ? 'flex' : 'none'}}>
+                <Text style={{textAlign: 'center', marginTop: 60, fontFamily: 'Copperplate', fontSize: 25}}>{responseText}</Text>
             </View>
-          
 
         </View>
     )
@@ -101,11 +97,13 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         marginVertical: 10,
-        backgroundColor: '#DBDBD6',
-        fontSize: 12,
+        backgroundColor: 'lavender',
+        fontSize: 14,
         borderWidth: 2,
         alignSelf: 'center',
         marginBottom: 20,
         textAlign: 'center',
+        borderRadius: 5,
+        fontWeight: 'bold'
     }
 })

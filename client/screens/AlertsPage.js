@@ -67,18 +67,18 @@ const AlertsPage = ({route}) => {
         if (user.alerts[i].type === 'friend_request') {
             alertsArr.push(
                 <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
-                    <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has sent a friend request!` : `${responseText}`}</Text>
+                    <Text style={{textAlign: 'center', fontSize: 17, marginBottom: 10, fontFamily: 'Copperplate'}}>{t ? `${user.alerts[i].sender} has sent a friend request!` : `${responseText}`}</Text>
                     <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%', marginRight: 10}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >
-                            <Text style={{textAlign: 'center'}}>Accept</Text>
+                            <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>Accept</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%'}}
                             onPress={() => requestDeclined(setT, user.alerts[i], i)}
                         >
-                            <Text style={{textAlign: 'center'}}>Decline</Text>
+                            <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>Decline</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -88,13 +88,13 @@ const AlertsPage = ({route}) => {
                 <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
                     <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has sent invited you to their group!` : `${responseText}`}</Text>
                     <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%'}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >
                             <Text style={{textAlign: 'center'}}>Accept</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%'}}
                             onPress={() => requestDeclined(setT, user.alerts[i], i)}
                         >
                             <Text style={{textAlign: 'center'}}>Decline</Text>
@@ -107,13 +107,13 @@ const AlertsPage = ({route}) => {
                 <View key={i} style={{width: '100%', height: '10%', borderBottomWidth: 3, borderRadius: 5, alignContent: 'center', justifyContent: 'center', marginBottom: 5}}>
                     <Text style={{textAlign: 'center', fontSize: 15, marginBottom: 10}}>{t ? `${user.alerts[i].sender} has invited you to a game!` : `${responseText}`}</Text>
                     <View style={{flexDirection: 'row', alignContent: 'center', justifyContent: 'center', display: t === true ? 'flex' : 'none'}}>
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%'}}
                             onPress={() => requestAccepted(setT, user.alerts[i], i)}
                         >
                             <Text style={{textAlign: 'center'}}>Accept</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%'}}
+                        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '20%'}}
                             onPress={() => requestDeclined(setT, user.alerts[i], i)}
                         >
                             <Text style={{textAlign: 'center'}}>Decline</Text>
@@ -128,8 +128,8 @@ const AlertsPage = ({route}) => {
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
-            <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center'}}>Alerts</Text>
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', position: 'absolute', top: 56, left: 10}}>
+            <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Alerts</Text>
+            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', top: 56, left: 10}}>
                 <Button 
                     title='<'
                     color='black'
@@ -140,7 +140,7 @@ const AlertsPage = ({route}) => {
             </View>
 
             <ScrollView style={{borderWidth: 3, borderRadius: 5, width: '95%', height: '75%', position: 'absolute', top: 130, backgroundColor: 'papayawhip', flex: 1, flexDirection: 'column'}} scrollEnabled={pendingAlerts}>
-                <Text style={{textAlign: 'center', marginTop: 10, fontSize: 20, display: pendingAlerts === false ? 'flex' : 'none'}}>No Alerts!</Text>
+                <Text style={{textAlign: 'center', marginTop: 10, fontSize: 22, display: pendingAlerts === false ? 'flex' : 'none', fontFamily: 'Copperplate'}}>No Alerts!</Text>
                 {alertsArr}
 
                 <View style={{marginBottom: 900}}>

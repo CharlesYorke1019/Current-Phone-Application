@@ -1,16 +1,13 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
-
 import ProfileButton from '../Components/ProfileButton';
 import User from '../Models/UserModel';
+import style from '../Styles/style';
 
 const io = require('socket.io-client');
 
 const Home = () => {
-    const socket = io("http://192.168.1.80:5000")
-
-    const navigation = useNavigation();
 
     function makeId(length) {
         var result = '';
@@ -21,66 +18,43 @@ const Home = () => {
         }
         return result;
     }
-    
+
+    const socket = io("http://192.168.1.75:5000")
+
+    const navigation = useNavigation();
+
     const [user, setUser] = useState(new User(makeId(30), 'guest', false, {}, false, {}, socket))
 
     user.changeCurrentPage('Home');
 
     user.socket.on('userConnects', () => {
-        user.socket.emit('confirmedUserConnects', (user.socket.id));  
+        user.socket.emit('confirmedUserConnects', user.socket.id); 
     })
 
     return (
         <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             <ProfileButton sentU={user} />
             <View style={{alignContent: 'center', justifyContent: 'center', borderWidth: 4, width: '100%', height: '70%', borderRadius: 5, backgroundColor: 'papayawhip', marginTop: 20}}>
-                <Text style={styles.headerStyle}>Pocket Chips</Text>
-                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey',alignSelf: 'center',width: 200, alignItems: 'center', marginBottom: 40}}>
-                    <Button 
-                        title='Create Game'
-                        color='black'
-                        onPress={() => navigation.navigate('CreateGame', {
-                            paramKey: user
-                        })}
-                    />
-                    
-                </View>
-                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', backgroundColor: 'lightgrey', alignSelf: 'center', width: 200, alignItems: 'center', marginBottom: 20}}>
-                    <Button 
-                        title='Join Game'
-                        color='black'
-                        onPress={() => navigation.navigate('JoinGame', {
-                            paramKey: user
-                        })}
-                    />
-                </View>
+                <Text style={style.appName}>Pocket Chips</Text>
+                <TouchableOpacity style={style.createGameBttn}
+                    onPress={() => navigation.navigate('CreateGame', {
+                        paramKey: user
+                    })}
+                >
+                    <Text style={style.buttonTexts}>Create Game</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={style.joinGameBttn}
+                    onPress={() => navigation.navigate('JoinGame', {
+                        paramKey: user
+                    })}
+                >
+                    <Text style={style.buttonTexts}>Join Game</Text>
+                </TouchableOpacity>
+
             </View>
         </View>
     )
 }
 
 export default Home
-
-const styles = StyleSheet.create({
-    inputStyle: {
-        width: '80%',
-        height: 40,
-        padding: 10,
-        marginVertical: 10,
-        backgroundColor: '#DBDBD6'
-    },
-
-    headerStyle: {
-        fontSize: 80,
-        alignSelf: 'center',
-        marginBottom: 60,
-        textAlign: 'center',
-    },
-
-    profileStyle: {
-        color: 'black',
-        borderColor: 'black',
-        position: 'absolute',
-        top: 10
-    }
-})

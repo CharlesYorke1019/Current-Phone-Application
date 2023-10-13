@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native'
 
@@ -66,15 +66,13 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip'}}>
-            <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', width: '100%', position: 'absolute', top: 0}}>
-                <Button 
-                    title='X'
-                    onPress={() => xOutOfWindow()}
-                    color='black'
-                />
-            </View>
-            <View style={{display: readyResponse === false ? 'flex' : 'none',  height: '50%', width: '80%', justifyContent: 'center', marginTop: '60%'}}>
-                <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130}}>Enter Username Of Friend You Want To Add</Text>
+            <TouchableOpacity style={{borderBottomWidth: 3, backgroundColor: 'lavender', alignSelf: 'center', width: '100%', position: 'absolute', top: 0, height: '10%'}}
+                onPress={() => xOutOfWindow()}
+            >
+                <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20, lineHeight: 38}}>X</Text>
+            </TouchableOpacity>
+            <View style={{display: readyResponse === false ? 'flex' : 'none',  height: '50%', width: '80%', justifyContent: 'center', marginTop: '62%'}}>
+                <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130, fontFamily: 'Copperplate'}}>Enter The Username You Want To Add</Text>
                 <TextInput 
                     value={friendUsernameHolder}
                     onChangeText={(friend) => submittedFriendUsername = friend}
@@ -82,17 +80,17 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
                     ref={usernameRef}
                     placeholder='enter here'
                 />
-                <View style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 130}}>
-                    <Button 
-                        title='Submit Friend Request'
-                        onPress={() => user.socket.emit('userSendsFriendRequest', submittedFriendUsername)}
-                        color='black'
-                    />
-                </View>
+
+                <TouchableOpacity style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 130, backgroundColor: 'lavender', borderRadius: 5}}
+                    onPress={() => user.socket.emit('userSendsFriendRequest', submittedFriendUsername)}
+                >
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 25, marginRight: 5, marginLeft: 5}}>Submit</Text>
+                </TouchableOpacity>
+
             </View>
 
-            <View style={{display: readyResponse === true ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center'}}>
-                <Text style={{textAlign: 'center'}}>{responseText}</Text>
+            <View style={{display: readyResponse === true ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', width: '75%'}}>
+                <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>{responseText}</Text>
             </View>
             
         </View>
@@ -108,12 +106,13 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         marginVertical: 10,
-        backgroundColor: '#DBDBD6',
+        backgroundColor: 'lavender',
         fontSize: 12,
         borderWidth: 2,
         position: 'absolute',
         alignSelf: 'center',
         top: -30,
-        textAlign: 'center'
+        textAlign: 'center',
+        borderRadius: 5
     }
 })

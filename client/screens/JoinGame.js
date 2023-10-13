@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput, LogBox } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, LogBox, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native'
 import GoHomeButton from '../Components/GoHomeButton';
@@ -41,7 +41,7 @@ const JoinGame = ({route}) => {
             <ProfileButton sentU={user} />
             <GoHomeButton user={user} />
             <View style={{position: 'absolute', top: 150, width: '100%'}}>
-                <Text style={{fontSize: 30,textAlign: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip'}}>Enter Game Code</Text>
+                <Text style={{fontSize: 32, textAlign: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontFamily: 'Copperplate'}}>Enter Game Code</Text>
             </View>
             <View style={{backgroundColor: 'papayawhip', width: '100%', borderWidth: 3, borderRadius: 5, position: 'absolute', top: 235}}>
                 <View>
@@ -52,13 +52,12 @@ const JoinGame = ({route}) => {
                             placeholder='enter here'
                         />
                 </View>
-                <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '20%', alignSelf: 'center', marginBottom: 40}}>
-                    <Button 
-                        title='Next'
-                        color='black'
-                        onPress={() => user.socket.emit('playerEntersGameCode', enteredGameCode)}
-                    />
-                </View>
+                <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', alignSelf: 'center', marginBottom: 40}}
+                    onPress={() => user.socket.emit('playerEntersGameCode', enteredGameCode)}
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5}}>Join Lobby</Text>
+                </TouchableOpacity>
+
             </View>
         </View>
     )
@@ -73,9 +72,9 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         marginVertical: 10,
-        backgroundColor: '#DBDBD6',
+        backgroundColor: 'lavender',
         alignSelf: 'center',
-        borderWidth: 2,
+        borderWidth: 3,
         borderRadius: 5,
         borderColor: 'black',
         textAlign: 'center',

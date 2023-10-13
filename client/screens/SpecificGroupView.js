@@ -1,4 +1,4 @@
-import { Button, Text, View, TouchableOpacity } from 'react-native';
+import { Button, Text, View, TouchableOpacity, TouchableHighlight } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import InvitingFriendsToGroup from './InvitingFriendsToGroup';
 import { useNavigation } from '@react-navigation/native'
@@ -51,6 +51,9 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
                 setSelectGroupMembers([
                     ...selectGroupMembers
                 ])
+
+                
+
             } else {
 
                 for (let i = 0; i < selectGroupMembers.length; i++) {
@@ -97,35 +100,33 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
                 for (let i = 0; i < user.groups[key].members.length; i++) {
                     if (user.groups[key].members[i] != user.accountInfo.username) {
                         membersArr.push(
-                            <View key={i} style={{ borderWidth: 2, borderRadius: 5, minWidth: '25%', maxHeight: '15%', justifyContent: 'center', marginTop: 10, justifyContent: 'center', alignContent: 'center', backgroundColor: selectGroupMembers.includes(user.groups[key].members[i]) === true ? 'lightcoral' : 'lightgrey'}}>
-                                <Button 
-                                    title={user.groups[key].members[i]}
-                                    color='black'
-                                    onPress={() => invitingPlayersToGroupGame(user.groups[key].members[i])}
-                                />
-                            </View>
+                            <TouchableOpacity key={i} style={{ borderWidth: 2, borderRadius: 5, minWidth: '25%', maxHeight: '15%', justifyContent: 'center', marginTop: 10, justifyContent: 'center', alignContent: 'center', backgroundColor: selectGroupMembers.includes(i) ? 'lightcoral' : 'lavender'}} disabled={!initStartGame}
+                                onPress={() => invitingPlayersToGroupGame(i)}
+                            >
+                                <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, marginRight: 5, marginLeft: 5, marginBottom: 5, marginTop: 5}}>{user.groups[key].members[i]}</Text>
+                            </TouchableOpacity>
                         )
                     }
                 }
                 if (user.groups[key].host === user.accountInfo.username) {
                     groupButtonsArr.push(
                         <View key={'hostStuff'} style={{alignSelf: 'center', justifyContent: 'center', position: 'absolute', top: 500}}>
-                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', marginBottom: 15}}
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', marginBottom: 15}}
                                 onPress={() => setInitStartGame(true)}
                             >
-                                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 5, marginLeft: 5}}>Start Game</Text>
+                                <Text style={{textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5, fontFamily: 'Copperplate'}}>Start Game</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center'}}>
-                                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 5, marginLeft: 5}}>Disband Group</Text>
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center'}}>
+                                <Text style={{textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5, fontFamily: 'Copperplate'}}>Disband Group</Text>
                             </TouchableOpacity>
                         </View>
                     )
                 } else {
                     groupButtonsArr.push(
                         <View key={'memberStuff'} style={{alignSelf: 'center', justifyContent: 'center', position: 'absolute', top: 500}}>
-                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', marginBottom: 15}}>
-                                <Text style={{textAlign: 'center', fontSize: 18, marginRight: 5, marginLeft: 5}}>Leave Group</Text>
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', marginBottom: 15}}>
+                                <Text style={{textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5, fontFamily: 'Copperplate'}}>Leave Group</Text>
                             </TouchableOpacity>
                         </View>
                     )
@@ -139,22 +140,22 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
     return (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', height: '85%'}}>
             <View style={{display: invitingMember === false && initStartGame === false ? 'flex' : 'none'}}>
-                <View style={{borderBottomWidth: 2, backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='x'
-                        color='black'
-                        onPress={() => setDisplayOpen(false)}
-                    />
-                </View>
-                <Text style={{fontSize: 35, textAlign: 'center', marginBottom: 20, marginTop: 10, borderBottomWidth: 2}}>{groupName}</Text>
-                <Text style={{textAlign: 'center', marginBottom: 15, fontSize: 20}}>Members</Text>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', alignSelf: 'center', justifyContent: 'center', marginBottom: 20, display: isHost === true ? 'flex' : 'none'}}>
-                    <Button 
-                        title='Invite Members'
-                        color='black'
-                        onPress={() => initGroupInvite()}
-                    />
-                </View> 
+              
+                <TouchableOpacity style={{borderBottomWidth: 2, backgroundColor: 'lavender'}}
+                    onPress={() => setDisplayOpen(false)}
+                >
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 20, lineHeight: 40, textAlign: 'center'}}>X</Text>
+                </TouchableOpacity>
+
+                <Text style={{fontSize: 39, textAlign: 'center', marginBottom: 15, marginTop: 15, borderBottomWidth: 2, fontFamily: 'Copperplate'}}>{groupName}</Text>
+                <Text style={{textAlign: 'center', marginBottom: 15, fontSize: 20, fontFamily: 'Copperplate'}}>Members</Text>
+
+                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', justifyContent: 'center', marginBottom: 20, display: isHost === true ? 'flex' : 'none'}}
+                    onPress={() => initGroupInvite()}
+                >
+                    <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, marginRight: 5, marginLeft: 5, marginBottom: 5, marginTop: 5}}>Invite Members</Text>
+                </TouchableOpacity>
+
                 <View style={{borderWidth: 3, borderRadius: 5, width: '90%', height: '50%', alignSelf: 'center', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap'}}>
                     {membersArr}
                 </View>
@@ -165,31 +166,30 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
             </View>
 
             <View style={{display: initStartGame === true ? 'flex' : 'none'}}>
-                <View style={{borderBottomWidth: 2, backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='x'
-                        color='black'
-                        onPress={() => xOutOfStartGame()}
-                    />
-                </View>
-                <Text style={{textAlign: 'center', marginTop: 20, marginBottom: 40, fontSize: 22}}>Select The Group Members You Wish To Invite</Text>
+        
+                <TouchableOpacity style={{borderBottomWidth: 2, backgroundColor: 'lavender'}}
+                    onPress={() => xOutOfStartGame()}
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20, lineHeight: 38}}>X</Text>
+                </TouchableOpacity>
+
+                <Text style={{textAlign: 'center', marginTop: 20, marginBottom: 20, fontSize: 24, fontFamily: 'Copperplate', width: '75%', alignSelf: 'center'}}>Select The Group Members You Wish To Invite</Text>
                 <View style={{borderWidth: 3, borderRadius: 5, width: '90%', height: '50%', alignSelf: 'center', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 30}}>
                     {membersArr}
                 </View>
-                <View style={{borderWidth: 2, backgroundColor: 'lightgrey', width: '50%', alignSelf: 'center', marginBottom: 34, borderRadius: 5}}>
-                    <Button 
-                        title='reset'
-                        color='black'
-                        onPress={() => setSelectGroupMembers([])}
-                    />
-                </View>
-                <View style={{borderTopWidth: 2, backgroundColor: 'lightgrey'}}>
-                    <Button 
-                        title='begin game'
-                        color='black'
-                        onPress={() => userBeginsGameWithGroup()}
-                    />
-                </View>
+
+                <TouchableOpacity style={{borderWidth: 2, backgroundColor: 'lavender', width: '50%', alignSelf: 'center', marginBottom: 34, borderRadius: 5}}
+                    onPress={() => setSelectGroupMembers([])}
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20, lineHeight: 38}}>Reset</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{borderTopWidth: 2, backgroundColor: 'lavender'}}
+                    onPress={() => userBeginsGameWithGroup()}
+                >
+                    <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20, lineHeight: 37}}>Begin Game</Text>
+                </TouchableOpacity>
+
             </View>
 
         </View>

@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useRef } from 'react';
 
 const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
@@ -56,15 +56,14 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
 
     return (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5}}>
-            <View style={{borderBottomWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 0, width: '100%'}}>
-                <Button 
-                    title='X'
-                    onPress={() => xOutOfWindow()}
-                    color='black'
-                />
-            </View>
+            <TouchableOpacity style={{borderBottomWidth: 3, backgroundColor: 'lavender', alignSelf: 'center', position: 'absolute', top: 0, width: '100%'}}
+                onPress={() => xOutOfWindow()}
+            >
+                <Text style={{fontFamily: 'Copperplate', fontSize: 20, lineHeight: 40, textAlign: 'center'}}>X</Text>
+            </TouchableOpacity>
+
             <View style={{display: readyResponse === false ? 'flex' : 'none', justifyContent: 'center', alignContent: 'center'}}>
-                <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130}}>Enter Username Of Friend You Want To Add</Text>
+                <Text style={{textAlign: 'center', fontSize: 24, position: 'absolute', alignSelf: 'center', top: -130, fontFamily: 'Copperplate'}}>Enter Username Of Friend You Want To Add</Text>
                 <TextInput 
                     value={friendUsernameHolder}
                     onChangeText={(friend) => submittedFriendUsername = friend}
@@ -72,17 +71,17 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
                     placeholder='enter here'
                     ref={usernameRef}
                 />
-                <View style={{borderWidth: 3, backgroundColor: 'lightgrey', alignSelf: 'center', position: 'absolute', top: 130}}>
-                    <Button 
-                        title='Send Invite'
-                        color='black'
-                        onPress={() => user.socket.emit('groupInviteSent', submittedFriendUsername, groupName)}
-                    />
-                </View>
+
+                <TouchableOpacity style={{borderWidth: 3, backgroundColor: 'lavender', alignSelf: 'center', position: 'absolute', top: 130, borderRadius: 5}}
+                    onPress={() => user.socket.emit('groupInviteSent', submittedFriendUsername, groupName)}
+                >
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 20, lineHeight: 40, textAlign: 'center', marginRight: 5, marginLeft: 5}}>Send Invite</Text>
+                </TouchableOpacity>
+
             </View>
 
             <View style={{display: readyResponse === true ? 'flex' : 'none', justifyContent: 'center', alignContent: 'center'}}>
-                <Text style={{textAlign: 'center'}}>{responseText}</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>{responseText}</Text>
             </View>
         </View>
     )
@@ -96,11 +95,12 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         marginVertical: 10,
-        backgroundColor: '#DBDBD6',
+        backgroundColor: 'lavender',
         fontSize: 12,
         borderWidth: 2,
         position: 'absolute',
         alignSelf: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        borderRadius: 5
     }
 })
