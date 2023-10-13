@@ -223,7 +223,7 @@ io.on('connection', (socket) => {
 
     // Pre Game Listeners //
 
-    socket.on('newGame', (rS, ante, timer, progressiveBlinds, gameStyle, bbMinRange, bbMaxRange, chipUnits, t1, t2) => {
+    socket.on('newGame', (rS, ante, timer, gameStyle, progressiveBlinds, bbMinRange, bbMaxRange, chipUnits, t1, t2) => {
         var roomName
         if (rS === 0 && ante === 0) {
             console.log('hi');
@@ -265,6 +265,7 @@ io.on('connection', (socket) => {
             }
 
             globalState[roomName.toString()] = gameSettingsObj;
+
         }
     })
 
@@ -372,6 +373,10 @@ io.on('connection', (socket) => {
     })
 
     
+
+    // socket.on('disconnect', () => {
+    //     console.log('user disconnected');
+    // })
 
 });
 
