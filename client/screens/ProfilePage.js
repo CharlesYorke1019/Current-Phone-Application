@@ -1,4 +1,4 @@
-import { Button, Text, View, LogBox, TouchableOpacity } from 'react-native';
+import { Text, View, LogBox, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import GoBackButton from '../Components/GoBackButton';
@@ -17,6 +17,8 @@ const ProfilePage = ({route}) => {
 
     let [initSignOut, setInitSignOut] = useState(false)
 
+    user.atProfilePage = true;
+
     //////////////////////////////////////////////////////////////////
  
     // Functions //
@@ -29,6 +31,9 @@ const ProfilePage = ({route}) => {
         user.socket.emit('userConfirmsSignOut');
     }
 
+    user.deleteIntereactedAlerts();
+
+    
     //////////////////////////////////////////////////////////////////
 
     // User Socket On's //
@@ -71,6 +76,10 @@ const ProfilePage = ({route}) => {
 
     user.socket.on('sendingGroupGameInvite', (inviteInfo) => {
         user.addAlert(inviteInfo);
+    })
+
+    user.socket.on('connectedUserDeletedAccount', (userInfo) => {
+        user.setInfo('deletion', userInfo)
     })
 
     //////////////////////////////////////////////////////////////////
@@ -122,24 +131,22 @@ const ProfilePage = ({route}) => {
                         <Text style={style.profileBttnText}>Sign Out</Text>
                     </TouchableOpacity>
 
-                    <View style={{display: initSignOut === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '80%', height: '40%', top: '30%'}}>
-                        <Text style={{textAlign: 'center', marginBottom: 40, fontSize: 25}}>Are You Sure You Want To Sign Out?</Text>
+                    <View style={{display: initSignOut === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '80%', height: '45%', top: '30%'}}>
+                        <Text style={{textAlign: 'center', marginBottom: 40, fontSize: 25, fontFamily: 'Copperplate'}}>Are You Sure You Want To Sign Out?</Text>
                         <View style={{flexDirection: 'row'}}>
-                            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey', marginRight: 20}}>
-                                <Button 
-                                    title='Yes'
-                                    color='black'
-                                    onPress={() => userConfirmsSignOut()}
-                                />
-                            </View>
+                            
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', marginRight: 20, justifyContent: 'center', width: '25%'}}
+                                onPress={() => userConfirmsSignOut()}
+                            >
+                                <Text style={{fontFamily: 'Copperplate', margin: 5, textAlign: 'center', fontSize: 20}}>Yes</Text>
+                            </TouchableOpacity>
 
-                            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lightgrey'}}>
-                                <Button 
-                                    title='No'
-                                    color='black'
-                                    onPress={() => setInitSignOut(false)}
-                                />
-                            </View>
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', justifyContent: 'center', width: '25%'}}
+                                onPress={() => setInitSignOut(false)}
+                            >
+                                <Text style={{fontFamily: 'Copperplate', margin: 5, textAlign: 'center', fontSize: 20}}>No</Text>
+                            </TouchableOpacity>
+
                         </View>
 
                     </View>

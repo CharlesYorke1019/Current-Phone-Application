@@ -75,7 +75,7 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
                 <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', width: '55%', alignSelf: 'center', justifyContent: 'center', alignContent: 'center', marginTop: 10}}
                     onPress={() => user.socket.emit('groupCreated', groupName)}
                 >
-                    <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, marginRight: 5, marginLeft: 5, marginTop: 5, marginBottom: 5}}>Create Group</Text>
+                    <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, margin: '2%'}}>Create Group</Text>
                 </TouchableOpacity>
 
             </View>

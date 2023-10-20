@@ -11,16 +11,14 @@ const LogIn = ({route}) => {
     const navigation = useNavigation();
     let user = route.params.paramKey
 
-    const liUser = {
-        username: null,
-        password: null
-    }
-
-    let passwordInput;
-    let usernameInput;
+    let usernameHolder;
+    let passwordHolder;
 
     const usernameRef = useRef();
     const passwordRef = useRef();
+
+    let [username, setUsername] = useState(null);
+    let [password, setPassword] = useState(null);
 
     let [loginFail, setLoginFail] = useState(false)
     let [responseText, setResponseText] = useState('');
@@ -32,7 +30,7 @@ const LogIn = ({route}) => {
     // Functions //
 
     const userAttemptsToLogIn = () => {
-        user.socket.emit('userLogsIn', liUser)
+        user.socket.emit('userLogsIn', username, password)
     }
 
     const togglePassword = () => {
@@ -44,26 +42,7 @@ const LogIn = ({route}) => {
     // User Socket On's
 
     user.socket.on('logInSuccessful', (userInfo) => {
-        user.accountInfo = {
-            username: userInfo.username,
-            password: userInfo.password,
-            email: userInfo.email
-        }
-
-        user.friendsList = userInfo.friendsList;
-        user.profileOptions = userInfo.profileOptions;
-        
-        for (var key in userInfo.groups) {
-            if (key) {
-                user.addGroup(userInfo.groups[key])
-            }
-        }
-
-        for (let i = 0; i < userInfo.pendingAlerts.length; i++) {
-            user.addAlert(userInfo.pendingAlerts[i])
-        }   
-
-        user.loggedIn = true;
+        user.setInfo('log_in', userInfo);
 
         navigation.navigate('Profile', {
             paramKey: user,
@@ -74,9 +53,6 @@ const LogIn = ({route}) => {
         setResponseText('User credientials are incorrect. Try again.')
 
         setLoginFail(true)
-
-        // usernameRef.current.clear();
-        // passwordRef.current.clear();
 
         setTimeout(() => {
             setLoginFail(false)
@@ -99,19 +75,19 @@ const LogIn = ({route}) => {
                         })}
                     />
                 </View>
-                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 100}}>
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: '12%'}}>
                     <Text style={{fontSize: 30, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Log In!</Text>
                 </View>
 
-                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
-                    <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                    <Text style={{textAlign: 'center', fontSize: 14, fontFamily: 'Copperplate'}}>{responseText}</Text>
                 </View>
 
                 <View style={{width: '100%', marginTop: -300}}>
 
                     <TextInput 
-                        value={usernameInput}
-                        onChangeText={(username) => liUser.username = username}
+                        value={usernameHolder}
+                        onChangeText={(v) => setUsername(v)}
                         onSubmitEditing={() => passwordRef.current.focus()}
                         style={styles.inputStyle}
                         placeholder='Username/Email'
@@ -121,8 +97,8 @@ const LogIn = ({route}) => {
                     
 
                     <TextInput 
-                        value={passwordInput}
-                        onChangeText={(password) => liUser.password = password}
+                        value={passwordHolder}
+                        onChangeText={(v) => setPassword(v)}
                         style={styles.inputStyle}
                         placeholder='Password'
                         ref={passwordRef}

@@ -96,7 +96,7 @@ const PlayerInGameDisplays = ({route}) => {
 
                 <View style={{display: initEnterGame === true ? 'flex' : 'none', position: 'absolute', alignSelf: 'center', top: 270, flex: 1, justifyContent: 'center'}}>
                     <ActivityIndicator size='large' color='lightcoral' />
-                    <Text style={{textAlign: 'center'}}>Loading Game State...</Text>
+                    <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>Loading Game State...</Text>
                 </View>
             </View>
         </TouchableWithoutFeedback>

@@ -15,7 +15,7 @@ const GroupsPage = ({route}) => {
     let [viewingGroup, setViewingGroup] = useState(false);
     let [specificGroupName, setSpecificGroupName] = useState('');
     let [specificGroupMembers, setSpecificGroupMembers] = useState('')
-
+    
     let groupsArr = [];
 
     //////////////////////////////////////////////////////////////////

@@ -10,16 +10,14 @@ const CreateAccount = ({route}) => {
 
     const navigation = useNavigation();
     let user = route.params.paramKey
-    
-    const caUser = {
-        chosenUN: null,
-        chosenP: null,
-        confirmChosenP: null
-    }
 
-    let usernameInput;
-    let passwordInput;
-    let confirmPasswordInput;
+    let usernameHolder;
+    let passwordHolder;
+    let confirmPasswordHolder;
+
+    let [createdUsername, setCreatedUsername] = useState('');
+    let [createdPassword, setCreatedPassword] = useState('');
+    let [createdConfirmPassword, setCreatedConfirmPassword] = useState('');
 
     const usernameRef = useRef();
     const passwordRef = useRef();
@@ -36,8 +34,8 @@ const CreateAccount = ({route}) => {
     // Functions //
 
     const sendingCreateAccount2Server = () => {
-        if (caUser.chosenP === caUser.confirmChosenP) {
-            user.socket.emit('userCreatesAccount', (caUser))
+        if (createdPassword === createdConfirmPassword) {
+            user.socket.emit('userCreatesAccount', createdUsername, createdPassword)
         } else {
             setResponseText('Passwords do not match. Please try again.')
             setCreateAccountFail(true)
@@ -100,22 +98,22 @@ const CreateAccount = ({route}) => {
                         />
                 </View>
 
-                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', marginBottom: 300, position: 'absolute', top: 100}}>
-                    <Text style={{fontSize: 31, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Create Account</Text>
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: '12%'}}>
+                    <Text style={{fontSize: 29, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Create Account</Text>
                 </View>
 
                 <View style={{width: '100%', marginTop: -200}}>
                     <TextInput
-                        value={usernameInput}
-                        onChangeText={(username) => caUser.chosenUN = username}
+                        value={usernameHolder}
+                        onChangeText={(v) => setCreatedUsername(v)}
                         onSubmitEditing={() => passwordRef.current.focus()}
                         style={styles.inputStyle}
                         placeholder='Username'
                         ref={usernameRef}
                     />
                     <TextInput 
-                        value={passwordInput}
-                        onChangeText={(password) => caUser.chosenP = password}
+                        value={passwordHolder}
+                        onChangeText={(v) => setCreatedPassword(v)}
                         onSubmitEditing={() => confirmPasswordRef.current.focus()}
                         style={styles.inputStyle}
                         placeholder='Password'
@@ -132,8 +130,8 @@ const CreateAccount = ({route}) => {
                     />
 
                     <TextInput 
-                        value={confirmPasswordInput}
-                        onChangeText={(password) => caUser.confirmChosenP = password}
+                        value={confirmPasswordHolder}
+                        onChangeText={(v) => setCreatedConfirmPassword(v)}
                         style={styles.inputStyle}
                         placeholder='Confirm Password'
                         ref={confirmPasswordRef}
@@ -150,8 +148,8 @@ const CreateAccount = ({route}) => {
 
                 </View>
 
-                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lightgrey', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
-                    <Text style={{textAlign: 'center', fontSize: 12}}>{responseText}</Text>
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                    <Text style={{textAlign: 'center', fontSize: 14, fontFamily: 'Copperplate'}}>{responseText}</Text>
                 </View>
 
                 <TouchableOpacity style={style.caSubmitBttn}
@@ -182,7 +180,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: 'center',
         marginTop: 20,
-        color: 'black'
+        color: 'black',
     },
 
     background: {

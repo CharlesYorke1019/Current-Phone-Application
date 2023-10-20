@@ -112,10 +112,10 @@ const CreateGame = ({route}) => {
                 <Text style={{fontFamily: 'Copperplate', fontSize: 28, marginRight: 5, marginLeft: 5}}>Next</Text>
             </TouchableOpacity>
 
-            <ScrollView style={{alignSelf: 'center', width: '90%', height: '75%', borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: 110}}  contentContainerStyle={{justifyContent: 'center', alignItems: 'center', padding: 10}} scrollEnabled={svScrollable} scrollsToTop={false} showsVerticalScrollIndicator={false}>
+            <ScrollView style={{alignSelf: 'center', width: '90%', height: '75%', borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: '13%'}}  contentContainerStyle={{justifyContent: 'center', alignItems: 'center', padding: 10}} scrollEnabled={svScrollable} scrollsToTop={false} showsVerticalScrollIndicator={false}>
 
             
-            <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 0, backgroundColor: 'papayawhip', marginTop: 10}}>
+            <View style={{borderWidth: 4, borderRadius: 5, width: '100%', position: 'absolute', top: 0, backgroundColor: 'papayawhip', marginTop: '3%'}}>
                 <Text style={{fontSize: 30, alignSelf: 'center', marginBottom: 10, fontFamily: 'Copperplate'}}>Choose Table Size</Text>
                 <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 5}}>
         
@@ -144,7 +144,7 @@ const CreateGame = ({route}) => {
                     </TouchableOpacity>
 
                 </View>
-                <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
+                <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: '6%'}}>
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 6 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
                         onPress={() => setActiveButton(6)}
                     >
@@ -171,7 +171,7 @@ const CreateGame = ({route}) => {
                 </View>
             </View>
 
-            <View style={{alignContent: 'center', position: 'absolute', top: 160, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', position: 'absolute', top: '18%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
                 <Text style={{fontSize: 30, marginBottom: 15, alignSelf: 'center', fontFamily: 'Copperplate'}}>Choose The Ante</Text>
                 <View style={{width: 100, alignSelf: 'center', marginBottom: 10}}>
                     <TextInput 
@@ -186,7 +186,7 @@ const CreateGame = ({route}) => {
 
             </View>
 
-            <View style={{alignContent: 'center', alignItems: 'center', position: 'absolute', top: 260, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', alignItems: 'center', position: 'absolute', top: '29.5%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
                 <Text style={{fontSize: 30, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate'}}>Chip Units</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: chipUnits === 1 ? 'lightcoral' : 'lavender', width: 60, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
@@ -204,7 +204,7 @@ const CreateGame = ({route}) => {
                 </View>
             </View>
 
-            <View style={{alignContent: 'center', alignItems: 'center', position: 'absolute', top: 370, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', alignItems: 'center', position: 'absolute', top: '42.5%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
                 <Text style={{fontSize: 30, marginBottom: 7, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5}}>Buy In Range</Text>
                 <Text style={{fontSize: 16, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate'}}>{bbMinRangeInput} BB - {bbMaxRangeInput} BB ({bbMinRangeInput * ante} - {bbMaxRangeInput * ante})</Text>
                 <MultiSlider 
@@ -227,7 +227,7 @@ const CreateGame = ({route}) => {
                 />
             </View>
 
-            <View style={{alignContent: 'center', position: 'absolute', top: 507, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', position: 'absolute', top: '58.5%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
                 <Text style={{fontSize: 30, alignSelf: 'center', marginBottom: 10, fontFamily: 'Copperplate', marginTop: 2}}>Game Style</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center', justifyContent: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: gameStyle === 'Cash' ? 'lightcoral' : 'lavender', width:120, height: 40, marginRight: 15}}
@@ -244,7 +244,7 @@ const CreateGame = ({route}) => {
                 </View>
             </View>
 
-            <View style={{alignContent: 'center', position: 'absolute', top: 615, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
+            <View style={{alignContent: 'center', position: 'absolute', top: '71%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
                 <Text style={{fontSize: 30, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5}}>Use A Timer?</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: useATimer === true ? 'lightcoral' : 'lavender', width:75, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
@@ -262,8 +262,8 @@ const CreateGame = ({route}) => {
 
             </View>
 
-            <View style={{alignContent: 'center', position: 'absolute', top: 725, borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip'}}>
-                <Text style={{fontSize: 28, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5}}>Progressive Blinds?</Text>
+            <View style={{alignContent: 'center', position: 'absolute', top: '84%', borderWidth: 4, borderRadius: 5, width: '100%', backgroundColor: 'papayawhip', marginBottom: '290%'}}>
+                <Text style={{fontSize: 26, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5, textAlign: 'center'}}>Progressive Blinds?</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: progressiveBlinds === true ? 'lightcoral' : 'lavender', width:75, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
                         onPress={() => setProgressiveBlinds(true)}
@@ -282,8 +282,7 @@ const CreateGame = ({route}) => {
             </View>
 
 
-            <View style={{marginBottom: 825}}>
-                {/* exists so that I can actually scroll in my scroll view without it snapping back to the top */}
+            <View style={{marginBottom: '280%'}}>
             </View>
 
             </ScrollView>
