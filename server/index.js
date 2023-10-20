@@ -19,6 +19,29 @@ function makeId(length) {
     return result;
 }
 
+function iterateOnNewUsername(aObj, originalName, newName) {
+    if (aObj[originalName]) {
+        for (let i = 0; i < aObj[originalName].friendsList.length; i++) {
+            let friend = aObj[originalName].friendsList[i];
+            for (let j = 0; j < aObj[friend].friendsList.length; j++) {
+                if (aObj[friend].friendsList[j] === originalName) {
+                    aObj[friend].friendsList[j] = newName;
+                }
+            } 
+
+            for (var key in aObj[friend].groups) {
+                if (aObj[friend].groups[key].members.includes(originalName)) {
+                    for (let j = 0; j < aObj[friend].groups[key].members.length; j++) {
+                        if (aObj[friend].groups[key].members[j] === originalName) {
+                            aObj[friend].groups[key].members[j] = newName;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 var possibleAccounts = {};
 var globalState = {};
 var gameSettingsObj;
@@ -50,24 +73,23 @@ io.on('connection', (socket) => {
 
     ////// USER CREATE ACCOUNT / LOG In LISTENERS //////
 
-    socket.on('userCreatesAccount', (createdAccount) => {
-        if (!possibleAccounts[createdAccount.chosenUN]) {
-            userBEI.caUsernameHolder = createdAccount.chosenUN;
-            possibleAccounts[createdAccount.chosenUN] = {username: createdAccount.chosenUN, password: createdAccount.chosenP, idHolder: userBEI.id, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: [], loggedIn: false, email: null, profileOptions:  {'useUsername': 'No', 'usePreSetChips': 'No', 'preSetChipAmount': 0}}
+    socket.on('userCreatesAccount', (username, password) => {
+        if (!possibleAccounts[username]) {
+            userBEI.caUsernameHolder = username;
+            possibleAccounts[username] = {username: username, password: password, idHolder: userBEI.id, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: [], loggedIn: false, email: null, profileOptions:  {'useUsername': 'No', 'usePreSetChips': 'No', 'preSetChipAmount': 0}}
             socket.emit('userAccountValid');
         } else {
             socket.emit('userAccountInvalid')
         }
     })
 
-    socket.on('userLogsIn', (loggedInAccount) => {
-
-        if (possibleAccounts[loggedInAccount.username]) {
-            if (loggedInAccount.password === possibleAccounts[loggedInAccount.username].password) {
-                possibleAccounts[loggedInAccount.username].idHolder = userBEI.id;
-                possibleAccounts[loggedInAccount.username].loggedIn = true;
-                userBEI.accountUsername = loggedInAccount.username
-                socket.emit('logInSuccessful', possibleAccounts[loggedInAccount.username])
+    socket.on('userLogsIn', (username, password) => {
+        if (possibleAccounts[username]) {
+            if (password === possibleAccounts[username].password) {
+                possibleAccounts[username].idHolder = userBEI.id;
+                possibleAccounts[username].loggedIn = true;
+                userBEI.accountUsername = username
+                socket.emit('logInSuccessful', possibleAccounts[username])
             } else {
                 socket.emit('logInFailed')
             }
@@ -89,10 +111,11 @@ io.on('connection', (socket) => {
                 possibleAccounts[username] = possibleAccounts[userBEI.accountUsername];
                 possibleAccounts[username].username = username
 
+                iterateOnNewUsername(possibleAccounts, userBEI.accountUsername, username);
+
                 delete possibleAccounts[userBEI.accountUsername];
 
                 userBEI.accountUsername = username;
-                
                 socket.emit('newUserInfoConfirmed', 'username_change', username);
             } else {
                 socket.emit('newInfoUserCannotBeSaved', 'username_exists')
@@ -103,22 +126,11 @@ io.on('connection', (socket) => {
             socket.emit('newUserInfoConfirmed', 'email_change', email)
         }
         
-        
-        // if (password != possibleAccounts[userBEI.accountUsername].password) {
-        //     // password was changed
-        //     possibleAccounts[userBEI.accountUsername].password = password;
-
-        //     socket.emit('newUserInfoConfirmed', 'password_change', password)
-        // } 
-        
-        // if (email != possibleAccounts[userBEI.accountUsername].email) {
-        //     possibleAccounts[userBEI.accountUsername].email = email;
-
-        //     socket.emit('newUserInfoConfirmed', 'email_change', email)
-        // }
+    
     })
 
     socket.on('newUserGameInfoSaved', (usernameDisplay, preSetChips, preSetChipsAmount) => {
+
         possibleAccounts[userBEI.accountUsername].profileOptions.useUsername = usernameDisplay;
         possibleAccounts[userBEI.accountUsername].profileOptions.usePreSetChips = preSetChips;
 
@@ -132,6 +144,34 @@ io.on('connection', (socket) => {
 
     })
 
+    socket.on('accountDeleted', () => {
+        if (possibleAccounts[userBEI.accountUsername]) {
+            for (let i = 0; i < possibleAccounts[userBEI.accountUsername].friendsList.length; i++) {
+                let friend = possibleAccounts[userBEI.accountUsername].friendsList[i];
+                for (let j = 0; j < possibleAccounts[friend].friendsList.length; i++) {
+                    if (possibleAccounts[friend].friendsList[i] === userBEI.accountUsername) {
+                        possibleAccounts[friend].friendsList.splice(i , 1);
+                    }
+                }
+                for (var key in possibleAccounts[friend].groups) {
+                    if (possibleAccounts[friend].groups[key].members.includes(userBEI.accountUsername)) {
+                        for (let j = 0; j < possibleAccounts[friend].groups[key].members.length; j++) {
+                            if (possibleAccounts[friend].groups[key].members[j] === userBEI.accountUsername) {
+                                possibleAccounts[friend].groups[key].members.splice(j, 1);
+                            }
+                        }
+                    }
+                }
+
+                io.to(possibleAccounts[friend].idHolder).emit('connectedUserDeletedAccount', possibleAccounts[friend]);
+
+
+                socket.emit('sendingAccountDeletion')
+            }
+            delete possibleAccounts[userBEI.accountUsername];
+        }
+    })
+
     //////////////////////////////////////////////////////////////////
 
     ////// SOCIALS LISTENERS //////
@@ -140,7 +180,7 @@ io.on('connection', (socket) => {
 
     socket.on('userSendsFriendRequest', (friendUsername) => {
         if (possibleAccounts[friendUsername]) {
-            let newAlert = {'type': 'friend_request', 'sender': userBEI.accountUsername}
+            let newAlert = {'type': 'friend_request', 'sender': userBEI.accountUsername, 'interacted': false}
             possibleAccounts[friendUsername].pendingAlerts.push(newAlert);
             possibleAccounts[friendUsername].friendRequests.push(userBEI.accountUsername);
             io.to(possibleAccounts[friendUsername].idHolder).emit('sendingFriendRequestToReciever', newAlert)
@@ -150,7 +190,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('friendRequestAccepted', (alertInfo, index) => {
+    socket.on('friendRequestAccepted', (alertInfo, index, info) => {
         possibleAccounts[userBEI.accountUsername].friendsList.push(alertInfo.sender)
         possibleAccounts[alertInfo.sender].friendsList.push(userBEI.accountUsername);
         socket.emit('friendRequestAcceptedConfirmed', alertInfo, index);
@@ -167,7 +207,7 @@ io.on('connection', (socket) => {
 
     socket.on('groupInviteSent', (username, groupName) => {
         if (possibleAccounts[username]) {
-            let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName}
+            let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName, 'interacted': false}
             possibleAccounts[username].pendingAlerts.push(newAlert)
 
             io.to(possibleAccounts[username].idHolder).emit('sendingGroupInvite', newAlert);
@@ -178,7 +218,8 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('groupRequestAccepted', (alertInfo, index) => {
+    socket.on('groupRequestAccepted', (alertInfo, index, info) => {
+       
         possibleAccounts[alertInfo.sender].groups[alertInfo.groupName].members.push(userBEI.accountUsername);
         possibleAccounts[alertInfo.sender].groups[alertInfo.groupName].totalMembers++;
         possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName] = possibleAccounts[alertInfo.sender].groups[alertInfo.groupName];
@@ -215,6 +256,17 @@ io.on('connection', (socket) => {
         userBEI.roomLabel = alertInfo.gameCode;
         socket.join(alertInfo.gameCode);
         socket.emit('sendingUserToGameAfterAccept', alertInfo, index);
+    })
+
+    socket.on('massInviteSentGroup', (groupName, arr) => {
+        for (let i = 0; i < arr.length; i++) {
+            if (possibleAccounts[arr[i]]) {
+                let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName}
+                possibleAccounts[arr[i]].pendingAlerts.push(newAlert);
+                io.to(possibleAccounts[arr[i]].idHolder).emit('sendingGroupInvite', newAlert)
+                socket.emit('massGroupInvConfirmed');
+            }
+        }
     })
 
     //////////////////////////////////////////////////////////////////
@@ -377,6 +429,10 @@ io.on('connection', (socket) => {
     // socket.on('disconnect', () => {
     //     console.log('user disconnected');
     // })
+
+    socket.on('hello', () => {
+        console.log('yo');
+    })
 
 });
 
