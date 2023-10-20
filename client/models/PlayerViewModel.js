@@ -40,19 +40,19 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView,
                     <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>Clear Bets</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '20%', position: 'absolute', top: 216, alignSelf: 'center', left: 20}}
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '20%', position: 'absolute', top: '90%', alignSelf: 'center', left: '5%'}}
                     onPress={() => setPlayerBetAmount(user.playerGameObj.currentGameAnte)}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>Ante</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '25%', position: 'absolute', top: 216, alignSelf: 'center'}}
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '25%', position: 'absolute', top: '90%', alignSelf: 'center'}}
                     onPress={() => setPlayerBetAmount(user.playerGameObj.currentGamePot / 2)}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>1/2 Pot</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '20%', position: 'absolute', top: 216, alignSelf: 'center', left: 270}}
+                <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '25%', position: 'absolute', top: '90%', alignSelf: 'center', left: '72%'}}
                     onPress={() => setPlayerBetAmount(playerChips)}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>All-In</Text>

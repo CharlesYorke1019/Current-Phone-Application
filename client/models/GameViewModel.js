@@ -258,7 +258,9 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
         gModel.setPlayerBorders(gameState, playerChips, turn)
 
-        user.playerGameObj.currentGameTurn = gModel.currentTurn; 
+        // user.playerGameObj.currentGameTurn = gModel.currentTurn;
+
+        user.playerGameObj.setInGameInfo(gModel);
 
     })
 
@@ -358,15 +360,15 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const InGameMenuButton = (
-        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: -110, top: '10%', height: 60, alignItems: 'center', justifyContent: 'center'}}
+        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: '-28%', top: '10%', height: '7%', alignItems: 'center', justifyContent: 'center', width: '10%'}}
             onPress={() => toggleInGameMenu()}
         >
-             <Text style={{fontFamily: 'Copperplate', fontSize: 32, marginRight: 5, marginLeft: 5}}>{'>'}</Text>
+             <Text style={{fontFamily: 'Copperplate', fontSize: 32}}>{'>'}</Text>
         </TouchableOpacity>
     )
 
     const InGameMenu = (
-        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '102%', height: '50%', left: -105, top: '10%', display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
+        <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', width: '102%', height: '50%', left: '-27%', top: '10%', display: inGameMenuActive === true && initLeaveGame === false ? 'flex' : 'none', position: 'absolute'}}>
         
             <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
                 onPress={() => toggleInGameMenu()}
@@ -454,7 +456,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             <Text style={{textAlign: 'center'}}></Text>
         }
         PlayerBorders.push(
-            <View key={i + 1} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', borderColor: toggleBBSelect === true && activeBBSelect === i + 1 ? 'blue' : gameTurn === i + 1 ? 'red' : 'black' , minWidth: 100, maxWidth: 120, top: inGamePlayerPositions[i].pTop, left: inGamePlayerPositions[i].pLeft}}>
+            <View key={i + 1} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', borderColor: toggleBBSelect === true && activeBBSelect === i + 1 ? 'blue' : gameTurn === i + 1 ? 'red' : 'black' , minWidth: '27%', top: inGamePlayerPositions[i].pTop, left: inGamePlayerPositions[i].pLeft}}>
                 <PlayersDisplayName />
                 <PlayersDisplayChips />
             </View>
@@ -553,14 +555,14 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let InvitingUserToGameWindow = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', width: '90%', height: '35%', display: initInvitingPlayer === true ? 'flex' : 'none', position: 'absolute', top: '20%'}}>
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', width: '90%', height: '35%', display: initInvitingPlayer === true  ? 'flex' : 'none', position: 'absolute', top: '20%'}}>
             <TouchableOpacity style={style.xBttn}
                 onPress={() => userXOutInvitingPlayer()}
             >
                 <Text style={style.xBttnFont}>X</Text>
             </TouchableOpacity>
 
-            <View style={{display: readyResponse === false ? 'flex' : 'none', marginTop: '35%'}}>
+            <View style={{display: readyResponse === false  ? 'flex' : 'none', marginTop: '35%'}}>
                 <Text style={{textAlign: 'center', fontSize: 22, position: 'absolute', alignSelf: 'center', top: -85, fontFamily: 'Copperplate'}}>Enter Username To Invite</Text>
                 <TextInput 
                     value={usernameInvitingHolder}
@@ -569,16 +571,20 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                     placeholder='enter here'
                     ref={usernameRef}
                 />
-                <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', width: '40%', top: 50, alignSelf: 'center'}}
+
+                <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', width: '40%', top: 80, alignSelf: 'center'}}
                     onPress={() => user.socket.emit('invitingPlayerToGame', usernameInviting)}
                 >
                     <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 20}}>Invite</Text>
                 </TouchableOpacity>
 
+
             </View>
             <View style={{display: readyResponse === true ? 'flex' : 'none', marginTop: '35%'}}>
                 <Text style={{textAlign: 'center', fontSize: 24, fontFamily: 'Copperplate'}}>{responseText}</Text>  
             </View>
+
+
 
         </View>
     )
@@ -722,10 +728,11 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             </View>
 
             <View style={{display: restrictionAddOn === true ? 'flex' : 'none'}}>
-                <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>{restrictionReason}</Text>
+                <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate', marginTop: '20%'}}>{restrictionReason}</Text>
             </View>
         </View>
     )
+    
 
     //////////////////////////////////////////////////////////////////
 

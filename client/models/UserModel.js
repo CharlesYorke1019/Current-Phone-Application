@@ -12,6 +12,7 @@ class User {
     gameId;
     auth;
     creatingGameMethod;
+    atProfilePage = false;
     groupMembersGameArr;
     friendRequests = [];
     friendsList = [];
@@ -46,13 +47,13 @@ class User {
         if (inviteInfo.type === 'friend_request') {
 
             if (!this.friendRequests.includes(inviteInfo.sender) && !this.friendsList.includes(inviteInfo.sender)) {
-                this.alerts.push({'type': inviteInfo.type, 'sender': inviteInfo.sender})
+                this.alerts.push({'type': inviteInfo.type, 'sender': inviteInfo.sender, 'interacted': inviteInfo.interacted})
                 this.friendRequests.push(inviteInfo.sender);
             }
 
         } else if (inviteInfo.type === 'group_invite') {
             if (!this.groupRequests.includes(inviteInfo.sender) && !this.groupNames.includes(inviteInfo.groupName)) {
-                this.alerts.push({'type': inviteInfo.type, 'sender': inviteInfo.sender, 'groupName': inviteInfo.groupName});
+                this.alerts.push({'type': inviteInfo.type, 'sender': inviteInfo.sender, 'groupName': inviteInfo.groupName, 'interacted': inviteInfo.interacted});
                 this.groupRequests.push(inviteInfo.sender);
             }
 
@@ -91,7 +92,6 @@ class User {
             }
         }
 
-        this.alerts.splice(index, 1);
     }
 
     addFriendToList(friendUsername) {
@@ -142,6 +142,59 @@ class User {
         this.groupRequests = [];
         this.gameInvites = [];
         this.alerts = [];
+    }
+
+    setInfo(type, userInfoBE) {
+        if (type === 'log_in') {
+            this.accountInfo = {
+                username: userInfoBE.username,
+                password: userInfoBE.password,
+                email: userInfoBE.email
+            }
+
+            this.friendsList = userInfoBE.friendsList;
+            this.profileOptions = userInfoBE.profileOptions;
+            
+            for (var key in userInfoBE.groups) {
+                if (key) {
+                    this.addGroup(userInfoBE.groups[key])
+                }
+            }
+
+            for (let i = 0; i < userInfoBE.pendingAlerts.length; i++) {
+                this.addAlert(userInfoBE.pendingAlerts[i])
+            }   
+
+            this.loggedIn = true;
+        } else if (type === 'deletion') {
+            this.friendsList = userInfoBE.friendsList;
+
+            for (var key in userInfoBE.groups) {
+                if (key) {
+                    this.addGroup(userInfoBE.groups[key])
+                }
+            }
+        }
+        
+
+    }
+
+    setAlertInteracted(alertInfo) {
+        for (let i = 0; i < this.alerts.length; i++) {
+            if (this.alerts[i].type === alertInfo.type && this.alerts[i].sender === alertInfo.sender) {
+                this.alerts[i].interacted = true;
+            }
+        }
+    }
+
+    deleteIntereactedAlerts() {
+        let arr = []
+        for (let i = 0; i < this.alerts.length; i++) {
+            if (!this.alerts[i].interacted) {
+                arr.push(this.alerts[i]);
+            }
+        }
+        this.alerts = arr;
     }
 
 
