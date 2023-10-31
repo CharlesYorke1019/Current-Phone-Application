@@ -82,6 +82,14 @@ const ProfilePage = ({route}) => {
         user.setInfo('deletion', userInfo)
     })
 
+    user.socket.on('sendingBackUpdateGroupInfo', (groupInfo) => {
+        user.updateGroupInfo(groupInfo);
+    })
+
+    user.socket.on('removedFromGroup', (groups) => {
+        user.updateGroupsAll(groups);
+    })
+
     //////////////////////////////////////////////////////////////////
 
     return (
@@ -98,7 +106,7 @@ const ProfilePage = ({route}) => {
                             paramKey: user
                         })}
                     >
-                        <Text style={style.profileBttnText}>Profile Info</Text>
+                        <Text style={style.profileBttnText}>Profile</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={style.friendsBttn}

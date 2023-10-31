@@ -39,7 +39,7 @@ const CreateGame = ({route}) => {
     }
 
     const relativeChipUnits = () => {
-        if (ante != undefined) {
+        if (ante != 0) {
             let anteStr = ante.toString();
             if (anteStr.includes('.')) {
                 setChipUnits(.01);
@@ -52,6 +52,34 @@ const CreateGame = ({route}) => {
     LogBox.ignoreLogs([
         'Non-serializable values were found in the navigation state',
     ]);
+
+    const setRoomSize = (n) => {
+        setActiveButton(n);
+    }
+
+    const setAnteInput = (v) => {
+        setAnte(v)
+    }
+
+    const setChipUnitsInput = (v) => {
+        setChipUnits(v)
+    }
+
+    const setScrollable = (v) => {
+        setSVScrollable(v)
+    }
+
+    const setGameStyleInput = (v) => {
+        setGameStyle(v)
+    }   
+
+    const setTimerInput = (v) => {
+        setUseATimer(v)
+    }
+
+    const setProgressiveBlindInput = (v) => {
+        setProgressiveBlinds(v);
+    }
 
     //////////////////////////////////////////////////////////////////
 
@@ -70,7 +98,7 @@ const CreateGame = ({route}) => {
             <ProfileButton sentU={user} />
             <GoHomeButton user={user} />
 
-            <TouchableOpacity style={{borderWidth: 2, borderColor: 'black', position: 'absolute', top: 57, backgroundColor: 'lavender', borderRadius: '50%', height: 30, width: 30, left: 30, alignSelf: 'center'}}
+            <TouchableOpacity style={{borderWidth: 2, borderColor: 'black', position: 'absolute', top: 65, backgroundColor: 'lavender', borderRadius: '50%', height: 30, width: 30, left: 35, alignSelf: 'center'}}
                 onPress={() => setInfoSection(true)}
             >
                 <Text style={{textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 28, fontSize: 18}}>?</Text>
@@ -120,25 +148,25 @@ const CreateGame = ({route}) => {
                 <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 5}}>
         
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 2 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}} 
-                        onPress={() => setActiveButton(2)}
+                        onPress={() => setRoomSize(2)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>2</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 3 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(3)}
+                        onPress={() => setRoomSize(3)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>3</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 4 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(4)}
+                        onPress={() => setRoomSize(4)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>4</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 5 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(5)}
+                        onPress={() => setRoomSize(5)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>5</Text>
                     </TouchableOpacity>
@@ -146,25 +174,25 @@ const CreateGame = ({route}) => {
                 </View>
                 <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: '6%'}}>
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 6 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(6)}
+                        onPress={() => setRoomSize(6)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>6</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 7 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(7)}
+                        onPress={() => setRoomSize(7)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>7</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 8 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(8)}
+                        onPress={() => setRoomSize(8)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>8</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, width: '15%', alignSelf: 'center', backgroundColor: activeButton === 9 ? 'lightcoral' : 'lavender', borderRadius: 5, marginRight: 5}}
-                        onPress={() => setActiveButton(9)}
+                        onPress={() => setRoomSize(9)}
                     >
                         <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 28}}>9</Text>
                     </TouchableOpacity>
@@ -176,7 +204,7 @@ const CreateGame = ({route}) => {
                 <View style={{width: 100, alignSelf: 'center', marginBottom: 10}}>
                     <TextInput 
                         value={anteInputHolder}
-                        onChangeText={(anteInput) => setAnte(Number(anteInput))}
+                        onChangeText={(anteInput) => setAnteInput(Number(anteInput))}
                         onEndEditing={() => relativeChipUnits()}
                         style={{backgroundColor: 'lavender', borderWidth: 2, borderRadius: 5, borderColor: 'black', textAlign: 'center', height: 25}}
                         keyboardType='numeric'
@@ -190,13 +218,13 @@ const CreateGame = ({route}) => {
                 <Text style={{fontSize: 30, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate'}}>Chip Units</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: chipUnits === 1 ? 'lightcoral' : 'lavender', width: 60, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
-                        onPress={() => setChipUnits(1)}
+                        onPress={() => setChipUnitsInput(1)}
                     >
                         <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>1</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: chipUnits === .01 ? 'lightcoral' : 'lavender', width:60, height: 40, alignItems: 'center', justifyContent: 'center'}}
-                        onPress={() => setChipUnits(.01)}
+                        onPress={() => setChipUnitsInput(.01)}
                     >
                         <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>.01</Text>
                     </TouchableOpacity>
@@ -219,7 +247,7 @@ const CreateGame = ({route}) => {
                     unselectedStyle={{borderColor: 'lavender', borderWidth: 1}}
                     markerStyle={{backgroundColor: 'lavender'}}
                     onValuesChange={(nArr) =>  setBBRange(nArr[0], nArr[1])}
-                    onValuesChangeFinish={() => setSVScrollable(true)}
+                    onValuesChangeFinish={() => setScrollable(true)}
                     snapped={true}
                     allowOverlap={false}
                     minMarkerOverlapDistance={0}
@@ -231,13 +259,13 @@ const CreateGame = ({route}) => {
                 <Text style={{fontSize: 30, alignSelf: 'center', marginBottom: 10, fontFamily: 'Copperplate', marginTop: 2}}>Game Style</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center', justifyContent: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: gameStyle === 'Cash' ? 'lightcoral' : 'lavender', width:120, height: 40, marginRight: 15}}
-                        onPress={() => setGameStyle('Cash')}
+                        onPress={() => setGameStyleInput('Cash')}
                     >
                         <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, lineHeight: 32}}>Cash Game</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: gameStyle === 'tourney' ? 'lightcoral' : 'lavender', width:135, height: 40}}
-                        onPress={() => setGameStyle('tourney')}
+                        onPress={() => setGameStyleInput('tourney')}
                     >
                         <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20, lineHeight: 32}}>Tournament</Text>
                     </TouchableOpacity>
@@ -248,13 +276,13 @@ const CreateGame = ({route}) => {
                 <Text style={{fontSize: 30, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5}}>Use A Timer?</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: useATimer === true ? 'lightcoral' : 'lavender', width:75, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
-                        onPress={() => setUseATimer(true)}
+                        onPress={() => setTimerInput(true)}
                     >
                         <Text style={{fontFamily: 'Copperplate', fontSize: 20}}>Yes</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: useATimer === false ? 'lightcoral' : 'lightgrey', width:75, height: 40, alignItems: 'center', justifyContent: 'center'}}
-                        onPress={() => setUseATimer(false)}
+                        onPress={() => setTimerInput(false)}
                     >
                         <Text style={{fontFamily: 'Copperplate', fontSize: 20}}>No</Text>
                     </TouchableOpacity>
@@ -266,13 +294,13 @@ const CreateGame = ({route}) => {
                 <Text style={{fontSize: 26, marginBottom: 10, alignSelf: 'center', fontFamily: 'Copperplate', marginTop: 5, textAlign: 'center'}}>Progressive Blinds?</Text>
                 <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                     <TouchableOpacity style={{borderWidth: 2, marginBottom: 10, borderRadius: 5, backgroundColor: progressiveBlinds === true ? 'lightcoral' : 'lavender', width:75, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: 15}}
-                        onPress={() => setProgressiveBlinds(true)}
+                        onPress={() => setProgressiveBlindInput(true)}
                     >
                         <Text style={{fontFamily: 'Copperplate', fontSize: 20}}>Yes</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: progressiveBlinds === false ? 'lightcoral' : 'lavender', width:75, height: 40, alignItems: 'center', justifyContent: 'center'}}
-                        onPress={() => setProgressiveBlinds(false)}
+                        onPress={() => setProgressiveBlindInput(false)}
                     >
                         <Text style={{fontFamily: 'Copperplate', fontSize: 20}}>No</Text>    
                     </TouchableOpacity>

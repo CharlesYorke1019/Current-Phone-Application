@@ -1,7 +1,9 @@
-import { Button, Text, View, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import InvitingFriendsToGroup from './InvitingFriendsToGroup';
 import { useNavigation } from '@react-navigation/native'
+import SpecificGroupSettings from './SpecificGroupSettings';
+import Icon from 'react-native-vector-icons/Ionicons'
 
 const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
 
@@ -19,11 +21,13 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
 
     let [initDeleteGroup, setInitDeleteGroup] = useState(false);
 
+    let [initLeaveGroup, setInitLeaveGroup] = useState(false)
+
+    let [settingsPage, setSettingsPage] = useState(false)
+
     let [isHost, setIsHost] = useState()
 
     let groupButtonsArr = [];
-
-    let groupInfo = {}
 
     
     //////////////////////////////////////////////////////////////////
@@ -84,11 +88,20 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
         user.socket.emit('startingGameWithGroup', mArr);
     }
 
+    const userConfirmsLeaveGroup = () => {
+        user.socket.emit('userLeavesGroup', groupName);
+    }
+
     const xOutOfStartGame = () => {
         setSelectGroupMembers([]);
         setInitStartGame(false);
     }
 
+    const userConfirmsDeleteGroup = () => {
+        user.socket.emit('groupDeletionConfirmed', groupName);
+    }
+
+    
     //////////////////////////////////////////////////////////////////
 
     // User Socket On's //
@@ -97,6 +110,23 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
         user.creatingGameMethod = 'group_game';
         user.groupMembersGameArr = membersInvitedArr;
         navigation.navigate('CreateGame', {
+            paramKey: user
+        })
+    })
+
+    user.socket.on('leaveGroupConfirmed', (groups) => {
+
+        user.updateGroupsAll(groups)
+
+        navigation.navigate('Profile', {
+            paramKey: user
+        })
+    })
+
+    user.socket.on('sendingBackGroupDeletion', (groups) => {
+        user.updateGroupsAll(groups)
+
+        navigation.navigate('Profile', {
             paramKey: user
         })
     })
@@ -135,10 +165,19 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
                             </TouchableOpacity>
                         </View>
                     )
+                    groupButtonsArr.push(
+                        <TouchableOpacity key={'hostStuff2'} style={{position: 'absolute', left: '85%', top: '12.5%'}}
+                            onPress={() => setSettingsPage(true)}
+                        >
+                            <Icon name='settings' size={25}></Icon>
+                        </TouchableOpacity>
+                    )
                 } else {
                     groupButtonsArr.push(
                         <View key={'memberStuff'} style={{alignSelf: 'center', justifyContent: 'center', position: 'absolute', top: 500}}>
-                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', marginBottom: 15}}>
+                            <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', marginBottom: 15}}
+                                onPress={() => setInitLeaveGroup(true)}
+                            >
                                 <Text style={{textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5, fontFamily: 'Copperplate'}}>Leave Group</Text>
                             </TouchableOpacity>
                         </View>
@@ -152,7 +191,7 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
 
     return (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', height: '85%'}}>
-            <View style={{display: invitingMember === false && initStartGame === false && initDeleteGroup === false ? 'flex' : 'none'}}>
+            <View style={{display: invitingMember === false && initStartGame === false && initDeleteGroup === false && initLeaveGroup === false && settingsPage === false ? 'flex' : 'none'}}>
               
                 <TouchableOpacity style={{borderBottomWidth: 2, backgroundColor: 'lavender'}}
                     onPress={() => setDisplayOpen(false)}
@@ -213,7 +252,9 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
                 </View>
 
                 <View style={{flexDirection: 'row', alignSelf: 'center', position: 'absolute', top: '45%'}}>
-                    <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', justifyContent: 'center', marginRight: 10}}>
+                    <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', justifyContent: 'center', marginRight: 10}}
+                        onPress={() => userConfirmsDeleteGroup()}
+                    >
                         <Text style={{fontFamily: 'Copperplate', fontSize: 26, textAlign: 'center', margin: 3}}>Yes</Text>
                     </TouchableOpacity>
 
@@ -224,6 +265,31 @@ const SpecificGroupView = ({user, currentView, setDisplayOpen, groupName}) => {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            <View style={{display: initLeaveGroup === true ? 'flex' : 'none', height: '100%'}}>
+                <View style={{width: '85%', alignSelf: 'center', marginTop: 20, marginBottom: 50}}>
+                    <Text style={{fontFamily: 'Copperplate', fontSize: 24, textAlign: 'center'}}>Are You Sure You Want To Leave This Group?</Text>
+                </View>
+
+                <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+                    <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', justifyContent: 'center', marginRight: 10}}
+                        onPress={() => userConfirmsLeaveGroup()}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', fontSize: 26, textAlign: 'center', margin: 3}}>Yes</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', justifyContent: 'center'}}
+                        onPress={() => setInitLeaveGroup(false)}
+                    >
+                        <Text style={{fontFamily: 'Copperplate', fontSize: 26, textAlign: 'center', margin: 3}}>No</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            <View style={{display: settingsPage === true ? 'flex' : 'none', height: '100%'}}>
+                <SpecificGroupSettings user={user} groupName={groupName} currentView={settingsPage} setCurrentView={setSettingsPage} />
+            </View>
+
 
         </View>
     )

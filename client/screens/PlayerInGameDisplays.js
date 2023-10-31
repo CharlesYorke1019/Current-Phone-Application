@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, TextInput, ActivityIndicator, TouchableWithoutF
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import Player from '../Models/PlayerModel'
-
 import GoHomeButton from '../Components/GoHomeButton';
 import ProfileButton from '../Components/ProfileButton';
 

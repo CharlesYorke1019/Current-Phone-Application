@@ -1,6 +1,7 @@
 import { Button, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native'
+import BackBttn from '../Components/BackBttnProfileSubPages';
 
 const AlertsPage = ({route}) => {
 
@@ -53,9 +54,16 @@ const AlertsPage = ({route}) => {
     }
 
     const requestDeclined = (alertInfo, index) => {
-        setResponseText('Invite Declined.')
+        user.setAlertInteracted(alertInfo);
 
         user.socket.emit('requestDeclined', alertInfo, index);
+
+        setResponseText('Invite Declined.')
+
+        interactedArr.push(index);
+        setInteractedArr([
+            ...interactedArr
+        ])
     }
 
     //////////////////////////////////////////////////////////////////
@@ -141,19 +149,11 @@ const AlertsPage = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+        <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Alerts</Text>
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', top: 56, left: 10}}>
-                <Button 
-                    title='<'
-                    color='black'
-                    onPress={() => navigation.navigate('Profile', {
-                        paramKey: user
-                    })}
-                />
-            </View>
+            <BackBttn user={user} />
 
-            <ScrollView style={{borderWidth: 3, borderRadius: 5, width: '95%', height: '75%', position: 'absolute', top: 130, backgroundColor: 'papayawhip', flex: 1, flexDirection: 'column'}} scrollEnabled={pendingAlerts}>
+            <ScrollView style={{borderWidth: 3, borderRadius: 5, width: '95%', height: '80%', position: 'absolute', top: 130, backgroundColor: 'papayawhip', flex: 1, flexDirection: 'column', alignSelf: 'center'}} scrollEnabled={pendingAlerts}>
                 <Text style={{textAlign: 'center', marginTop: 10, fontSize: 22, display: pendingAlerts === false ? 'flex' : 'none', fontFamily: 'Copperplate'}}>No Alerts!</Text>
                 {alertsArr}
 

@@ -1,4 +1,4 @@
-import { Button, TextInput, Text, View, LogBox, StyleSheet, TouchableOpacity } from 'react-native';
+import { TextInput, Text, View, LogBox, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import style from '../Styles/style';
 
@@ -23,6 +23,12 @@ const EditAccountInfoPage = ({user, setCurrentView}) => {
     LogBox.ignoreLogs([
         'Non-serializable values were found in the navigation state',
     ]);
+
+    const userInitChangeInfo = () => {
+        if (usernameHolder != user.accountInfo.username || passwordHolder != user.accountInfo.password || emailHolder != user.accountInfo.email) {
+            setInitChangeInfo(true);
+        }
+    }
 
     const userSavesNewAccountInfo = () => {
         user.socket.emit('newUserInfoSaved', usernameHolder, passwordHolder, emailHolder);
@@ -110,7 +116,7 @@ const EditAccountInfoPage = ({user, setCurrentView}) => {
                 />
 
                 <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', width: '30%', position: 'absolute', alignSelf: 'center', top: 370}}
-                    onPress={() => setInitChangeInfo(true)}
+                    onPress={() => userInitChangeInfo()}
                 >
                     <Text style={{fontFamily: 'Copperplate', margin: 5, textAlign: 'center', fontSize: 20}}>Save</Text>
                 </TouchableOpacity>

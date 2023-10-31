@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import style from '../Styles/style';
+import BackBttn from '../Components/BackBttnProfileSubPages';
 
 const CreateAccount = ({route}) => {
 
@@ -72,9 +73,9 @@ const CreateAccount = ({route}) => {
 
         setCreateAccountFail(true)
 
-        usernameRef.current.clear();
-        passwordRef.current.clear();
-        confirmPasswordRef.current.clear();
+        // usernameRef.current.clear();
+        // passwordRef.current.clear();
+        // confirmPasswordRef.current.clear();
 
         setTimeout(() => {
             setCreateAccountFail(false)
@@ -88,21 +89,13 @@ const CreateAccount = ({route}) => {
             onPress={() => Keyboard.dismiss()}
         >
             <View style={styles.background}>
-                <View style={style.caBackBttn}>
-                        <Button 
-                            title='<'
-                            color='black'
-                            onPress={() => navigation.navigate('Profile', {
-                                paramKey: user
-                            })}
-                        />
+                <BackBttn user={user} />
+
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 55}}>
+                    <Text style={{fontSize: 29, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Create Account</Text>
                 </View>
 
-                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: '12%'}}>
-                    <Text style={{fontSize: 29, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Create Account</Text>
-                </View>
-
-                <View style={{width: '100%', marginTop: -200}}>
+                <View style={{width: '100%', marginTop: -220}}>
                     <TextInput
                         value={usernameHolder}
                         onChangeText={(v) => setCreatedUsername(v)}
@@ -148,7 +141,7 @@ const CreateAccount = ({route}) => {
 
                 </View>
 
-                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: createAccountFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: '15%'}}>
                     <Text style={{textAlign: 'center', fontSize: 14, fontFamily: 'Copperplate'}}>{responseText}</Text>
                 </View>
 

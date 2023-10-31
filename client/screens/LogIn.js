@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import style from '../Styles/style';
+import BackBttn from '../Components/BackBttnProfileSubPages';
 
 const LogIn = ({route}) => {
 
@@ -66,24 +67,16 @@ const LogIn = ({route}) => {
             onPress={() => Keyboard.dismiss()}
         >
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
-                <View style={style.liBackBttn}>
-                    <Button 
-                        title='<'
-                        color='black'
-                        onPress={() => navigation.navigate('Profile', {
-                            paramKey: user
-                        })}
-                    />
-                </View>
-                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: '12%'}}>
-                    <Text style={{fontSize: 30, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 35}}>Log In!</Text>
+                <BackBttn user={user} />
+                <View style={{borderWidth: 3, backgroundColor: 'papayawhip', borderRadius: 5, width: '70%', position: 'absolute', top: 55}}>
+                    <Text style={{fontSize: 30, textAlign: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Log In!</Text>
                 </View>
 
-                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: 150}}>
+                <View style={{width: '100%', height: 40, borderWidth: 3, borderRadius: 5, borderColor: 'red', backgroundColor: 'lavender', display: loginFail === true ? 'flex' : 'none', position: 'absolute', justifyContent: 'center', top: '15%'}}>
                     <Text style={{textAlign: 'center', fontSize: 14, fontFamily: 'Copperplate'}}>{responseText}</Text>
                 </View>
 
-                <View style={{width: '100%', marginTop: -300}}>
+                <View style={{width: '100%', marginTop: -310}}>
 
                     <TextInput 
                         value={usernameHolder}

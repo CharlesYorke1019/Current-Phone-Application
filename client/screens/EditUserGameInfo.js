@@ -40,6 +40,11 @@ const EditUserGameInfo = ({user, setCurrentView}) => {
 
         } else {
             setCurrentView(false);
+
+            setUsernameDisplay(user.profileOptions.useUsername);
+            setPreSetChips(user.profileOptions.usePreSetChips)
+            setPreSetChipAmount(user.profileOptions.preSetChipAmount);
+
         }
     }
 

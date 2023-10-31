@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import CreatingGroupPage from './CreatingGroupPage';
 import SpecificGroupView from './SpecificGroupView';
+import BackBttn from '../Components/BackBttnProfileSubPages';
 import style from '../Styles/style';
 
 const GroupsPage = ({route}) => {
@@ -56,18 +57,10 @@ const GroupsPage = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+        <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
             <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Groups</Text>
-            <View style={{flex: 1, display: creatingGroupInit === false && viewingGroup === false ? 'flex' : 'none', alignItems: 'center'}}>
-                <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', position: 'absolute', top: 56, left: -170}}>
-                    <Button 
-                        title='<'
-                        color='black'
-                        onPress={() => navigation.navigate('Profile', {
-                            paramKey: user
-                        })}
-                    />
-                </View>
+            <View style={{flex: 1, display: creatingGroupInit === false && viewingGroup === false ? 'flex' : 'none'}}>
+                <BackBttn user={user} /> 
 
                 <TouchableOpacity style={style.createGroupBttn}
                     onPress={() => setCreatingGroupInit(true)}
@@ -76,7 +69,7 @@ const GroupsPage = ({route}) => {
                 </TouchableOpacity>
 
 
-                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: 180, width: '95%', height: '75%', backgroundColor: 'papayawhip', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: 180, width: '95%', height: '75%', backgroundColor: 'papayawhip', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignSelf: 'center'}}>
                    
                     {groupsArr}
 
@@ -84,11 +77,11 @@ const GroupsPage = ({route}) => {
 
             </View>
 
-            <View style={{flex: 1, display: creatingGroupInit === true ? 'flex' : 'none', width: '80%', marginTop: 160}}>
+            <View style={{flex: 1, display: creatingGroupInit === true ? 'flex' : 'none', width: '80%', marginTop: 160, alignSelf: 'center'}}>
                 <CreatingGroupPage setCreatingGroup={setCreatingGroupInit} user={user} />
             </View>
 
-            <View style={{flex: 1, display: viewingGroup === true ? 'flex' : 'none', width: '80%', marginTop: 120}}>    
+            <View style={{flex: 1, display: viewingGroup === true ? 'flex' : 'none', width: '80%', marginTop: 120, alignSelf: 'center'}}>    
                 <SpecificGroupView user={user} currentView={viewingGroup} setDisplayOpen={setViewingGroup} groupName={specificGroupName} />
             </View>
 

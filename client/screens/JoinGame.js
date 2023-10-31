@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput, LogBox, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, LogBox, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native'
 import GoHomeButton from '../Components/GoHomeButton';
@@ -40,11 +40,18 @@ const JoinGame = ({route}) => {
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey', backgroundColor: 'mistyrose'}}>
             <ProfileButton sentU={user} />
             <GoHomeButton user={user} />
-            <View style={{position: 'absolute', top: 150, width: '100%'}}>
-                <Text style={{fontSize: 32, textAlign: 'center', borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontFamily: 'Copperplate'}}>Enter Game Code</Text>
-            </View>
-            <View style={{backgroundColor: 'papayawhip', width: '100%', borderWidth: 3, borderRadius: 5, position: 'absolute', top: 235}}>
-                <View>
+            
+            <View style={{backgroundColor: 'papayawhip', width: '100%', borderWidth: 3, borderRadius: 5, position: 'absolute', top: '13%', height: '75%'}}>
+                <View style={{borderBottomWidth: 3, justifyContent: 'center'}}>
+                    <Text style={{fontSize: 40, textAlign: 'center', borderBottomWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontFamily: 'Copperplate', lineHeight: 40}}>Enter Game Code</Text>
+                </View>
+
+                <View style={{width: '80%', alignSelf: 'center', position: 'absolute', top: '15%'}}>
+                    <Text style={{fontSize: 12, fontFamily: 'Copperplate', textAlign: 'center', marginBottom: '2%'}}>When The Host Created The Game, A Game Code Was Generated. Please Enter That Here</Text>
+                    <Text style={{fontSize: 10, fontFamily: 'Copperplate', textAlign: 'center'}}>(Game Code Can Be Found In The In Game Menu)</Text>
+                </View>
+
+                <View style={{position: 'absolute', alignSelf: 'center', top: '30%', width: '80%'}}>
                         <TextInput 
                             value={gameCodeHolder}
                             onChangeText={(gameCode) => enteredGameCode = gameCode}
@@ -52,7 +59,7 @@ const JoinGame = ({route}) => {
                             placeholder='enter here'
                         />
                 </View>
-                <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', alignSelf: 'center', marginBottom: 40}}
+                <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', alignSelf: 'center', position: 'absolute', top: '60%'}}
                     onPress={() => user.socket.emit('playerEntersGameCode', enteredGameCode)}
                 >
                     <Text style={{fontFamily: 'Copperplate', textAlign: 'center', fontSize: 22, marginRight: 5, marginLeft: 5}}>Join Lobby</Text>

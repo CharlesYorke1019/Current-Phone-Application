@@ -1,9 +1,11 @@
-import { Button, StyleSheet, Text, View, LogBox, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, LogBox, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 
 import EditAccountInfoPage from './EditAccountInfoPage';
 import EditUserGameInfo from './EditUserGameInfo';
+
+import BackBttn from '../Components/BackBttnProfileSubPages';
 
 const ProfileInfoPage = ({route}) => {
 
@@ -46,17 +48,11 @@ const ProfileInfoPage = ({route}) => {
     //////////////////////////////////////////////////////////////////
 
     return ( 
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
-            <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', position: 'absolute', top: 55, left: 10, display: editAccountInfo === false && editUserGameInfo === false && initDeleteAccount === false ? 'flex' : 'none'}}>
-                <Button 
-                    title='<'
-                    color='black'
-                    onPress={() => navigation.navigate('Profile', {
-                        paramKey: user
-                    })}
-                />
+        <View style={{flex: 1, justifyContent: 'center', backgroundColor: 'mistyrose', borderWidth: 8, borderRadius: 10, borderColor: 'lightgrey'}}>
+            <View style={{display: editAccountInfo === false && editUserGameInfo === false && initDeleteAccount === false ? 'flex' : 'none', flex: 1}}>
+                <BackBttn user={user} />
             </View>
-            <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Account Info</Text>
+            <Text style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', fontSize: 30, width: '70%', height: '5.2%', textAlign: 'center', position: 'absolute', top: 55, alignSelf: 'center', fontFamily: 'Copperplate', lineHeight: 38}}>Profile</Text>
             <View style={{borderWidth: 3, width: '100%', height: '30%', backgroundColor: 'papayawhip', borderRadius: 5, position: 'absolute', top: 120, display: editAccountInfo === false && editUserGameInfo === false && initDeleteAccount === false ? 'flex' : 'none'}}>
                 <View style={{borderBottomWidth: 2 ,width: '100%'}}>
                     <Text style={{textAlign: 'center', fontSize: 25, marginTop: 10, fontFamily: 'Copperplate'}}>User Account Info</Text>
@@ -100,15 +96,15 @@ const ProfileInfoPage = ({route}) => {
             </TouchableOpacity>
 
 
-            <View style={{display: editAccountInfo === true ? 'flex' : 'none', width: '80%'}}>
+            <View style={{display: editAccountInfo === true ? 'flex' : 'none', width: '80%', alignSelf: 'center'}}>
                 <EditAccountInfoPage user={user} setCurrentView={setEditAccountInfo}/>
             </View>
 
-            <View style={{display: editUserGameInfo === true ? 'flex' : 'none', width: '80%'}}>
+            <View style={{display: editUserGameInfo === true ? 'flex' : 'none', width: '80%', alignSelf: 'center'}}>
                 <EditUserGameInfo user={user} setCurrentView={setEditUserGameInfo} />
             </View>
 
-            <View style={{display: initDeleteAccount === true ? 'flex' : 'none', width: '80%', height: '33%', borderWidth: 2, borderRadius: 5, backgroundColor: 'papayawhip', position: 'absolute', top: '33%'}}>
+            <View style={{display: initDeleteAccount === true ? 'flex' : 'none', width: '80%', height: '33%', borderWidth: 2, borderRadius: 5, backgroundColor: 'papayawhip', position: 'absolute', top: '33%', alignSelf: 'center'}}>
                 <View style={{width: '85%', alignSelf: 'center', marginTop: 20, marginBottom: 50}}>
                     <Text style={{fontFamily: 'Copperplate', fontSize: 24, textAlign: 'center'}}>Are You Sure You Want To Delete Your Account?</Text>
                     <Text style={{fontFamily: 'Copperplate', fontSize: 16, textAlign: 'center'}}>(This Action Is Irreversible)</Text>
