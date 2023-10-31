@@ -2,6 +2,7 @@ import { Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native'
 import style from '../Styles/style';
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 const GoHomeButton = ({user}) => {
     const navigation = useNavigation();
@@ -15,7 +16,9 @@ const GoHomeButton = ({user}) => {
         <TouchableOpacity style={style.homeBttn}
             onPress={() => sendHome()}
         >
-            <Text style={style.homeBttnText}>Home</Text>
+            <Icon name="home" size={42}>
+
+            </Icon>
         </TouchableOpacity>
         
     )
