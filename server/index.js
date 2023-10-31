@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { group } = require("console");
 const express = require("express");
 const http = require("http");
 const socketIO = require('socket.io');
@@ -76,7 +77,7 @@ io.on('connection', (socket) => {
     socket.on('userCreatesAccount', (username, password) => {
         if (!possibleAccounts[username]) {
             userBEI.caUsernameHolder = username;
-            possibleAccounts[username] = {username: username, password: password, idHolder: userBEI.id, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: [], loggedIn: false, email: null, profileOptions:  {'useUsername': 'No', 'usePreSetChips': 'No', 'preSetChipAmount': 0}}
+            possibleAccounts[username] = {username: username, password: password, idHolder: null, pendingAlerts: [], friendRequests: [], friendsList: [], groups: {}, groupNames: [], loggedIn: false, email: null, profileOptions:  {'useUsername': 'No', 'usePreSetChips': 'No', 'preSetChipAmount': 0}}
             socket.emit('userAccountValid');
         } else {
             socket.emit('userAccountInvalid')
@@ -100,7 +101,9 @@ io.on('connection', (socket) => {
 
     socket.on('userConfirmsSignOut', () => {
         possibleAccounts[userBEI.accountUsername].loggedIn = false;
+        possibleAccounts[userBEI.accountUsername].idHolder = null;
         userBEI.loggedIn = false;
+        userBEI.accountUsername = null;
         socket.emit('sendingBackSignOutConfirmation');
     })
 
@@ -124,6 +127,10 @@ io.on('connection', (socket) => {
             possibleAccounts[userBEI.accountUsername].email = email;
 
             socket.emit('newUserInfoConfirmed', 'email_change', email)
+        } else if (password != possibleAccounts[userBEI.accountUsername].password) {
+            possibleAccounts[userBEI.accountUsername].password = password;
+
+            socket.emit('newUserInfoConfirmed', 'password_change', password);
         }
         
     
@@ -227,6 +234,14 @@ io.on('connection', (socket) => {
         io.to(possibleAccounts[alertInfo.sender].idHolder).emit('groupInviteHasBeenAccepted', possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName])
         socket.emit('sendingGroupInfoAfterInviteAccepted', possibleAccounts[userBEI.accountUsername].groups[alertInfo.groupName], alertInfo, index)
 
+        for (let i = 0; i < possibleAccounts[userBEI.accountUsername].pendingAlerts.length; i++) {
+            if (possibleAccounts[userBEI.accountUsername].pendingAlerts[i].type === 'group_invite') {
+                if (possibleAccounts[userBEI.accountUsername].pendingAlerts[i].sender === alertInfo.sender && possibleAccounts[userBEI.accountUsername].pendingAlerts[i].groupName === alertInfo.groupName) {
+                    possibleAccounts[userBEI.accountUsername].pendingAlerts.splice(i, 1);
+                }
+            }
+        }
+
     })
 
     socket.on('startingGameWithGroup', (groupPlayersArr) => {
@@ -235,6 +250,71 @@ io.on('connection', (socket) => {
         }
 
         socket.emit('gameThroughGroupConfirmed', groupPlayersArr);
+    })
+
+    socket.on('userLeavesGroup', (groupName) => {
+        
+        for (let i = 0; i < possibleAccounts[userBEI.accountUsername].groups[groupName].members.length; i++) {
+            let member = possibleAccounts[userBEI.accountUsername].groups[groupName].members[i];
+
+            for (let j = 0; j < possibleAccounts[member].groups[groupName].members.length; j++) {
+                if (possibleAccounts[member].groups[groupName].members[j] === userBEI.accountUsername) {
+                    possibleAccounts[member].groups[groupName].members.splice(j, 1);
+                }
+
+                io.to(possibleAccounts[member].idHolder).emit('sendingBackUpdateGroupInfo', possibleAccounts[member].groups[groupName]);
+            }
+        }
+
+        delete possibleAccounts[userBEI.accountUsername].groups[groupName];
+        socket.emit('leaveGroupConfirmed', possibleAccounts[userBEI.accountUsername].groups);
+ 
+
+    })
+
+    socket.on('groupDeletionConfirmed', (groupName) => {
+        for (let i = 0; i < possibleAccounts[userBEI.accountUsername].groups[groupName].members.length; i++) {
+
+            if (possibleAccounts[userBEI.accountUsername].groups[groupName].members[i] != userBEI.accountUsername) {
+                let member = possibleAccounts[userBEI.accountUsername].groups[groupName].members[i];
+
+                delete possibleAccounts[member].groups[groupName]
+
+                io.to(possibleAccounts[member].idHolder).emit('sendingGroupDeletionToMembers', possibleAccounts[member].groups);
+            }
+            
+        }
+
+        delete possibleAccounts[userBEI.accountUsername].groups[groupName];
+        socket.emit('sendingBackGroupDeletion', possibleAccounts[userBEI.accountUsername].groups);
+
+
+    })
+
+    socket.on('groupMembersRemoved', (groupName, groupMembersArr) => {
+
+        let groupInfo = possibleAccounts[userBEI.accountUsername].groups[groupName];
+
+        let afterActionMembers = [];
+
+        for (let i = 0; i < groupInfo.members.length; i++) {
+            if (!groupMembersArr.includes(groupInfo.members[i])) {
+                afterActionMembers.push(groupInfo.members[i]);
+            }
+        }
+
+        groupInfo.members = afterActionMembers;
+
+        for (let i = 0; i < groupMembersArr.length; i++) {
+            delete possibleAccounts[groupMembersArr[i]].groups[groupName];
+            io.to(possibleAccounts[groupMembersArr[i]].idHolder).emit('removedFromGroup', possibleAccounts[groupMembersArr[i]].groups);
+        }
+
+        groupInfo.members.forEach((el) => {
+            possibleAccounts[el].groups[groupName] = groupInfo;
+            io.to(possibleAccounts[el].idHolder).emit('groupMembersRemovalConfirmed', possibleAccounts[el].groups[groupName]);
+        })
+
     })
 
     // Other Listeners //
@@ -356,9 +436,8 @@ io.on('connection', (socket) => {
 
     // In Game Listeners //
 
-    socket.on('winnerHasBeenChosen', (winner) => {
-        console.log(winner);
-        io.to(userBEI.roomLabel).emit('sendingBackWinnerOfRound', winner)
+    socket.on('winnerHasBeenChosen', (winner, type) => {
+        io.to(userBEI.roomLabel).emit('sendingBackWinnerOfRound', winner, type)
     })
 
     socket.on('initNextRound', () => {
@@ -370,26 +449,41 @@ io.on('connection', (socket) => {
         // globalState[userBEI.roomLabel].pNickNames[turn - 1] = '';
         // globalState[userBEI.roomLabel].pChips[turn - 1] = '';
 
-        globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
-        globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
-        globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
+        // if there is more than one player (meaning the game will continue) 
+        if (globalState[userBEI.roomLabel].players.length > 1) {
+            globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
+            globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
+            globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
 
+            io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
 
-        io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
+        } else {
+            // if there is only one player left (meaning the lobby will be disbanded)
 
-        if (globalState[userBEI.roomLabel].active) {
-            if (globalState[userBEI.roomLabel].players.length === 0) {
-                // console.log('Game Empty Deleting Room: ')
-                // console.log(globalState[userBEI.roomLabel]);
-                delete globalState[userBEI.roomLabel]   
-            }
+            delete globalState[userBEI.roomLabel]
+
         }
-
-        // console.log('Global State current state: ')
-        // console.log(globalState);
 
         socket.leave(userBEI.roomLabel)
         userBEI.roomLabel = null;
+
+        // if (globalState[userBEI.roomLabel].players.length > 1) {
+        //     globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
+        //     globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
+        //     globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
+        // }
+
+
+        // io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
+
+        // if (globalState[userBEI.roomLabel].active) {
+        //     if (globalState[userBEI.roomLabel].players.length === 0) {
+        //         delete globalState[userBEI.roomLabel]   
+        //     }
+        // }
+
+        // socket.leave(userBEI.roomLabel)
+        // userBEI.roomLabel = null;
     })
 
     socket.on('roomSizeChanged', (newRS) => {
@@ -404,6 +498,10 @@ io.on('connection', (socket) => {
         globalState[userBEI.roomLabel].totalBuyIns[turn - 1] += amount;
 
         io.to(userBEI.roomLabel).emit('sendingBackAddOn', turn, totalChips, globalState[userBEI.roomLabel].totalBuyIns[turn - 1]);
+    })
+
+    socket.on('isABlind', (type) => {
+        socket.emit('sendingBlindToUser', type);
     })
 
     // PLAYER IN GAME LISTENERS //
@@ -424,15 +522,7 @@ io.on('connection', (socket) => {
         io.to(userBEI.roomLabel).emit('playerChecks', turn)
     })
 
-    
 
-    // socket.on('disconnect', () => {
-    //     console.log('user disconnected');
-    // })
-
-    socket.on('hello', () => {
-        console.log('yo');
-    })
 
 });
 
