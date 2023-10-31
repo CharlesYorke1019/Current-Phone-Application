@@ -1,4 +1,4 @@
-import { Button, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import {  Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import BackBttn from '../Components/BackBttnProfileSubPages';
@@ -30,7 +30,7 @@ const AlertsPage = ({route}) => {
         }
 
 
-    })
+    }, []);
 
     const requestAccepted = (alertInfo, index) => {
         
