@@ -1,11 +1,11 @@
 # Current-Phone-Application
 Code for phone application as of September 6th, 2023.
 
-Application is written in JS (React-Native) and uses Socket.io for a server
+Application is written in React.js (React-Native) and uses Socket.io for a server
 
 Just started teaching myself React/React-Native about 3 weeks ago (this was written on Wed, September 20th, 2023) so there are definitly some things to approve upon
 
-But I have accounted for all game logic game sizes 2-9, guest/logged in users, and group logic, friends logic, alerts logic and sign out logic for logged in users
+But I have accounted for all game logic game sizes 2-9, guest/logged in users, and group, friends, alerts and sign out logic for logged in users
 
 I also have a youtube video displaying what the application looks like
 
