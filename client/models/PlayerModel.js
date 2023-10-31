@@ -101,13 +101,27 @@ class Player {
         this.chips -= arg;
     }
 
-    dragsChips(eX, eY, chipAmount) {
-        if (eX > 40 && eX < 315) {
-            if (eY > 313 && eY < 455) {
+    dragsChips(windowWidth, windowHeight, eX, eY, chipAmount) {
+        // percentage conversion
+        let left = (eX / windowWidth) * 100;
+        let top = (eY / windowHeight) * 100; 
+
+        if (left > 11 && left < 90) {
+            if (top > 27 && top < 55) {
                 this.betAmount += chipAmount;
                 this.setterBetAmount(this.betAmount);
             }
         }
+
+        // original
+
+        // if (eX > 40 && eX < 315) {
+        //     if (eY > 313 && eY < 455) {
+        //         this.betAmount += chipAmount;
+        //         this.setterBetAmount(this.betAmount);
+        //     }
+        // }
+
     }
 
     winnerOfRound(chipsWon) {
@@ -135,6 +149,22 @@ class Player {
 
     setChips(c) {
         this.chips = c;
+    }
+
+    setPlayerViewInfo(cb1, cb2) {
+        this.setterChips = cb1;
+        this.setterBetAmount = cb2;
+    }
+
+    setBetting(unit) {
+        if (unit === 'ANTE') {
+            this.setterChips(this.currentGameAnte)
+        } else if (unit === '1/2') {
+            this.setterChips(this.currentGamePot / 2)
+        } else if (unit === 'ALL-IN') {
+            this.setterChips(this.chips);
+        }
+
     }
 
 }

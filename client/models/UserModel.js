@@ -115,7 +115,7 @@ class User {
     leaveGame(arg) {
         this.socket.emit('userLeavesGame', arg);
         this.currentPage = 'Home';
-        this.playerGameObject;
+        this.playerGameObject = {};
     }
 
     updateAccountInfo(changeType, infoChanged) {
@@ -197,9 +197,16 @@ class User {
         this.alerts = arr;
     }
 
+    updateGroupsAll(groups) {
+        this.groups = groups;
 
+        for (let i = 0; i < this.groupNames.length; i++) {
+            if (this.groupNames[i] != groups.name) {
+                this.groupNames.splice(i, 1);
+            }
+        }
+    }
 
-    
 }
 
 export default User;

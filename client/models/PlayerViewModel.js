@@ -1,6 +1,8 @@
-import { Button, Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import Draggable from 'react-native-draggable';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {Dimensions} from 'react-native';
 
 
 export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView, chips}) => {
@@ -11,11 +13,26 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView,
 
     let [playerChips, setPlayerChips] = useState(user.playerGameObj.chips)
     let [playerBetAmount, setPlayerBetAmount] = useState(user.playerGameObj.betAmount)
-    
-    user.playerGameObj.setterChips = setPlayerChips;
-    user.playerGameObj.setterBetAmount = setPlayerBetAmount;    
-    
 
+    if (gameStarted) {
+        user.playerGameObj.setPlayerViewInfo(setPlayerChips, setPlayerBetAmount);   
+    }
+    
+    const windowWidth = Dimensions.get('window').width;
+    const windowHeight = Dimensions.get('window').height;
+
+    //////////////////////////////////////////////////////////////////
+
+    // User Socket On's //
+
+    user.socket.on('sendingBlindToUser', (type) => {
+        if (type === 'bb') {
+            setPlayerChips(user.playerGameObj.chips - user.playerGameObj.currentGameAnte);
+        } else if (type === 'sb') {
+            setPlayerChips(user.playerGameObj.chips - (user.playerGameObj.currentGameAnte / 2));
+        }
+    })
+    
     //////////////////////////////////////////////////////////////////
 
     return (
@@ -41,19 +58,19 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView,
                 </TouchableOpacity>
 
                 <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '20%', position: 'absolute', top: '90%', alignSelf: 'center', left: '5%'}}
-                    onPress={() => setPlayerBetAmount(user.playerGameObj.currentGameAnte)}
+                    onPress={() => user.playerGameObj.setBetting('ANTE')}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>Ante</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '25%', position: 'absolute', top: '90%', alignSelf: 'center'}}
-                    onPress={() => setPlayerBetAmount(user.playerGameObj.currentGamePot / 2)}
+                    onPress={() => user.playerGameObj.setBetting('1/2')}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>1/2 Pot</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={{borderWidth: 2, borderBottomWidth: 0, borderRadius: 5, backgroundColor: 'lavender', width: '25%', position: 'absolute', top: '90%', alignSelf: 'center', left: '72%'}}
-                    onPress={() => setPlayerBetAmount(playerChips)}
+                    onPress={() => user.playerGameObj.setBetting('ALL-IN')}
                 >
                     <Text style={{textAlign: 'center', fontSize: 22, fontFamily: 'Copperplate'}}>All-In</Text>
                 </TouchableOpacity>
@@ -78,26 +95,53 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView,
             </TouchableOpacity>
 
             <View style={{borderWidth: 4, borderRadius: 5, backgroundColor: 'papayawhip', position: 'absolute', top: '77%', width: '100%', height: '10%'}}>
-                <Draggable x={10} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.smallest)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 16, fontFamily: 'Copperplate'}}>{chips.smallest}</Text>
+
+                {/* White Chip */}
+                <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', position: 'absolute', top: '-32%', left: '5%', transform: [{rotateX: '40deg'}]}}>
+                    <Icon name="poker-chip" size={60} color="white"></Icon>
+                    <Text style={{fontSize: 26, fontFamily: 'Copperplate', textAlign: 'center', color: 'lavender', marginBottom: 10}}>{chips.smallest}</Text>
+                </View>
+                <Draggable x={'4.5%'} y={'-33%'} onDragRelease={(e) => user.playerGameObj.dragsChips(windowWidth, windowHeight, e.nativeEvent.pageX, e.nativeEvent.pageY, chips.smallest)} shouldReverse={true}>  
+                    <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', zIndex: 1, transform: [{rotateX: '40deg'}]}}>
+                        <Icon name="poker-chip" size={60} color="white"></Icon>
                     </View>
                 </Draggable>
-                <Draggable x={100} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondSmallest)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'red', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 16, fontFamily: 'Copperplate'}}>{chips.secondSmallest}</Text>
+
+                {/* Red Chip */}
+                <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', position: 'absolute', top: '-32%', left: '29.5%', transform: [{rotateX: '40deg'}]}}>
+                    <Icon name="poker-chip" size={60} color="red"></Icon>
+                    <Text style={{fontSize: 26, fontFamily: 'Copperplate', textAlign: 'center', color: 'lavender', marginBottom: 10}}>{chips.secondSmallest}</Text>
+
+                </View>
+                <Draggable x={'27.5%'} y={'-33%'} onDragRelease={(e) => user.playerGameObj.dragsChips(windowWidth, windowHeight, e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondSmallest)} shouldReverse={true}>  
+                    <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', transform: [{rotateX: '40deg'}]}}>
+                        <Icon name="poker-chip" size={60} color="red"></Icon>
                     </View>
                 </Draggable>
-                <Draggable x={190} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondLargest)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'lightblue', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 16, fontFamily: 'Copperplate'}}>{chips.secondLargest}</Text>
+
+                {/* Lightblue Chip */}
+                <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', position: 'absolute', top: '-32%', left: '54.5%', transform: [{rotateX: '40deg'}]}}>
+                    <Icon name="poker-chip" size={60} color="lightblue"></Icon>
+                    <Text style={{fontSize: 26, fontFamily: 'Copperplate', textAlign: 'center', color: 'lavender', marginBottom: 10}}>{chips.secondLargest}</Text>
+                </View>
+                <Draggable x={'51%'} y={'-33%'} onDragRelease={(e) => user.playerGameObj.dragsChips(windowWidth, windowHeight, e.nativeEvent.pageX, e.nativeEvent.pageY, chips.secondLargest)} shouldReverse={true}>  
+                    <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', zIndex: 1, transform: [{rotateX: '40deg'}]}}>
+                        <Icon name="poker-chip" size={60} color="lightblue"></Icon>
                     </View>
                 </Draggable>
-                <Draggable x={280} y={-38} onDragRelease={(e) => user.playerGameObj.dragsChips(e.nativeEvent.pageX, e.nativeEvent.pageY, chips.largest)} shouldReverse={true}>  
-                    <View style={{borderWidth: 2, borderRadius: '50%', width: 50, height: 50, position: 'absolute', top: 50, left: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'green', borderStyle: 'dashed'}}>
-                        <Text style={{fontSize: 16, fontFamily: 'Copperplate'}}>{chips.largest}</Text>
+
+                {/* Green Chip */}
+                <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', position: 'absolute', top: '-32%', left: '80%', transform: [{rotateX: '40deg'}]}}>
+                    <Icon name="poker-chip" size={60} color="green"></Icon>
+                    <Text style={{fontSize: 26, fontFamily: 'Copperplate', textAlign: 'center', color: 'lavender', marginBottom: 10}}>{chips.largest}</Text>
+
+                </View>
+                <Draggable x={'75%'} y={'-33%'} onDragRelease={(e) => user.playerGameObj.dragsChips(windowWidth, windowHeight, e.nativeEvent.pageX, e.nativeEvent.pageY, chips.largest)} shouldReverse={true}>  
+                    <View style={{alignSelf: 'center', backgroundColor: 'black', borderRadius: '50%', transform: [{rotateX: '40deg'}]}}>
+                        <Icon name="poker-chip" size={60} color="green"></Icon>
                     </View>
                 </Draggable>
+           
             </View>
 
         </View>

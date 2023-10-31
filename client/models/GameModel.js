@@ -16,10 +16,14 @@ class GameModel {
     pDisplayNames;
     pDisplayChips;
     roundTransition = false;
+    sidePotActive = false;
+    sidePot = 0;
+    totalSidePots = 0;
     gameStyle;
     gameTime = 0;
     active = true;
     gameStarted;
+    anyPlayersAllIn = false;
 
     constructor(gameSize, currentTurn, currentRound, currentBettor, lastBet, gameArray, bigBlind, smallBlind, pot, ante, pFoldedArr, roundSetter, roundTransitionSetter, pDisplayNames, pDisplayChips, gameStyle) {
         this.gameSize = gameSize
@@ -157,8 +161,6 @@ class GameModel {
                 this.ante * 2;
                 this.gameTime = 0;
             }
-            
-
         }
 
         this.currentTurn = this.gameArray[0];
@@ -337,6 +339,22 @@ class GameModel {
 
     setProgressiveBlinds() {
 
+    }
+
+    setPot(betAmount, activePot, cb) {
+        if (!this.sidePotActive) {
+            this.pot += betAmount;
+            activePot += betAmount
+            cb(activePot);
+        } else {
+            this.sidePot += betAmount;
+            activePot += betAmount;
+            cb(activePot);
+        }
+    }
+
+    setSidePotActive() {
+        this.sidePotActive = true;
     }
 
 }
