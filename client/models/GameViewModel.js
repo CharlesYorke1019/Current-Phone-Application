@@ -64,6 +64,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     let addOnAmount = null;
     let addOnHolder;
+    let addOnRef = useRef();
 
     let usernameRef = useRef();
 
@@ -101,7 +102,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     }
 
     const userInivitingPlayerToGame = () => {
-        setInGameMenuActive(false)
+        triggerGameMenuAnimation();
         if (roomSize > gameState.players.length) {
             setInitInvitingPlayer(true);
         } else {
@@ -140,6 +141,13 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         }
     }
 
+    const toggleLeaveGame = () => {
+        setInitLeaveGame(!initLeaveGame);
+        triggerGameMenuAnimation();
+
+        moveMenu();
+    }
+
     const userLeavesGame = () => {
         user.leaveGame(user.playerGameObj.turn);
         navigation.navigate('Home');
@@ -147,7 +155,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     const toggleRoomSizeChangeWindow = () => {
         setChangeRS(!changeRS);
-        setInGameMenuActive(!inGameMenuActive);
+        triggerGameMenuAnimation();
 
         if (changeRSOptions != 0) {
             setChangeRSOptions(0);
@@ -163,15 +171,16 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     }
 
     const toggleGameInfoWindow = () => {
-        setInGameMenuActive(!inGameMenuActive);
+        triggerGameMenuAnimation();
         setGameInfoDisplay(!gameInfoDisplay);
 
         moveMenu();
     }
 
+
     const toggleAddOnWindow = () => {
-        setInGameMenuActive(!inGameMenuActive);
         setAddOnWindow(!addOnWindow);
+        triggerGameMenuAnimation();
 
         if (gameStarted) {
             setRestrictionReason('Please Wait Until The Current Round Is Over To Add-On.')
@@ -181,6 +190,12 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         if (readyResponse) {
             setReadyResponse(false);
             setResponseText('');
+
+            addOnRef.current.clear();
+        } else {
+            if (addOnRef.current != null) {
+                addOnRef.current.clear();
+            }
         }
 
         moveMenu();
@@ -204,9 +219,19 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         }
     }
 
+    const triggerGameMenuAnimation = () => {
+        if (!inGameMenuActive) {
+            setInGameMenuActive(true);
+        } else {
+            setTimeout(() => {
+                setInGameMenuActive(false);
+            }, 350)
+        }
+    }
+
     const toggleInGameMenu = () => {
         setMenuButton(!menuButton);
-        setInGameMenuActive(!inGameMenuActive);
+        triggerGameMenuAnimation();
 
         moveMenu();
     }
@@ -417,7 +442,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const InGameMenuButton = (
-        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', display: inGameMenuActive === false && playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: '-28%', top: '10%', height: '7%', alignItems: 'center', justifyContent: 'center', width: '10%'}}
+        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', display: playerView === true && menuButton === true ? 'flex' : 'none', position: 'absolute', left: '-28%', top: '10%', height: '7%', alignItems: 'center', justifyContent: 'center', width: '10%'}}
             onPress={() => toggleInGameMenu()}
         >
              <Text style={{fontFamily: 'Copperplate', fontSize: 32}}>{'>'}</Text>
@@ -425,7 +450,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const InGameMenu = (
-        <Animated.View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '60%', height: '80%', left: '-110%', top: '10%', display: initLeaveGame === false ? 'flex' : 'none', position: 'absolute', marginLeft: leftValue}}>
+        <Animated.View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '60%', height: '80%', left: '-110%', top: '10%', position: 'absolute', marginLeft: leftValue, display: inGameMenuActive === true ? 'flex' : 'none'}}>
         
             <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
                 onPress={() => toggleInGameMenu()}
@@ -461,7 +486,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
             {/* WILL GO AT BOTTOM OF MENU SO LEAVING SPACE FOR OTHER ELEMENTS */}
             <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', position: 'absolute', top: '90%'}}
-                onPress={() => setInitLeaveGame(true)}
+                onPress={() => toggleLeaveGame()}
             >
                 <Text style={{textAlign: 'center', marginRight: 5, marginLeft: 5, fontSize: 20, fontFamily: 'Copperplate'}}>Leave Game</Text>
             </TouchableOpacity>
@@ -479,7 +504,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                 </TouchableOpacity>
 
                 <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender'}}
-                    onPress={() => setInitLeaveGame(false)}
+                    onPress={() => toggleLeaveGame(false)}
                 >
                     <Text style={{textAlign: 'center', marginRight: 7, marginLeft: 7, fontSize: 25, fontFamily: 'Copperplate', lineHeight: 30}}>No</Text>
                 </TouchableOpacity>
@@ -493,7 +518,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             <Text style={{textAlign: 'center', fontFamily: 'Copperplate'}}>{activeRound}</Text>
         </View>
     )
-
 
     for (let i = 0; i < roomSize; i++) {
         if (gameState.pNickNames[i] != undefined ) {
@@ -796,6 +820,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
                             keyboardType='numeric'
                             style={styles.inputStyle}
                             placeholder='enter here'
+                            ref={addOnRef}
                         />
                     </View>
                     

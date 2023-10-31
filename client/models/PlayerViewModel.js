@@ -14,9 +14,7 @@ export const PlayerGameView = ({userObj, gameStarted, playerView, setPlayerView,
     let [playerChips, setPlayerChips] = useState(user.playerGameObj.chips)
     let [playerBetAmount, setPlayerBetAmount] = useState(user.playerGameObj.betAmount)
 
-    if (gameStarted) {
-        user.playerGameObj.setPlayerViewInfo(setPlayerChips, setPlayerBetAmount);   
-    }
+    user.playerGameObj.setPlayerViewInfo(setPlayerChips, setPlayerBetAmount);
     
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
