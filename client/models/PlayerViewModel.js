@@ -1,5 +1,5 @@
 import { Text, View, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Draggable from 'react-native-draggable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {Dimensions} from 'react-native';

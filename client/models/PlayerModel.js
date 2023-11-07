@@ -19,6 +19,8 @@ class Player {
     setterTapCount;
     setterInitCheck;
     chipsDistr;
+    isBigBlind;
+    isSmallBlind;
 
     constructor(displayName, chips, turn, betAmount, folded, roomId, socket) {
         this.displayName = displayName;
@@ -62,7 +64,8 @@ class Player {
 
     displayBet() {
         this.setterChips(this.chips)
-        this.setterBetAmount(0);
+        this.betAmount = 0
+        this.setterBetAmount(this.betAmount);
     }
 
     displayChipsAnte(ante, blind) {
@@ -75,14 +78,7 @@ class Player {
 
     calls() {
         if (this.currentGameTurn === this.turn) {
-            if (this.currentGameBettor === 0) {
-                if (this.currentGameRound === 0) {
-                    this.betToCall = this.currentGameAnte;
-                }
-            } 
-
             this.chips -= this.betToCall;
-
             this.socket.emit('pCallsBet', this.turn, this.betToCall, this.chips)
         }
     }
@@ -135,6 +131,7 @@ class Player {
         this.currentGameAnte = gameModel.ante;
         this.currentGameBettor = gameModel.currentBettor;
         this.currentGameRound = gameModel.currentRound;
+        this.betToCall = gameModel.lastBet;
     }
 
     clearsBet() {
@@ -158,11 +155,11 @@ class Player {
 
     setBetting(unit) {
         if (unit === 'ANTE') {
-            this.setterChips(this.currentGameAnte)
+            this.setterBetAmount(this.currentGameAnte)
         } else if (unit === '1/2') {
-            this.setterChips(this.currentGamePot / 2)
+            this.setterBetAmount(this.currentGamePot / 2)
         } else if (unit === 'ALL-IN') {
-            this.setterChips(this.chips);
+            this.setterBetAmount(this.chips);
         }
 
     }

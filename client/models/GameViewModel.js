@@ -17,7 +17,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     // let roomSize = rS;
     let [roomSize, setRoomSize] = useState(rS);
 
-    const gameState = gameObj;
+    let gameState = gameObj;
 
     let PlayerBorders = [];
     let PlayersDisplayName;
@@ -43,12 +43,10 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     let [restrictionInvitingPlayers, setRestrictionInvitingPlayers] = useState(false);
     let [restrictionReason, setRestrictionReason] = useState('');
     let [changeRS, setChangeRS] = useState(false);
-    let [restrictedChangeRS, setRestrictedChangeRS] = useState(false);
     let [changeRSOptions, setChangeRSOptions] = useState(0);
     let [activeBBSelect, setActiveBBSelect] = useState(0);
     let [toggleBBSelect, setToggleBBSelect] = useState(false)
     let [activeSBSelect, setActiveSBSelect] = useState();
-    let [firstToAct, setFirstToAct] = useState();
     let [activePot, setActivePot] = useState();
     let [activeRound, setActiveRound] = useState();
     let [gameTurn, setGameTurn] = useState();
@@ -86,19 +84,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
     const userSettingBigBlind = (turn) => {
         setActiveBBSelect(turn);
-        if (turn === 1) {
-            setActiveSBSelect(2)
-            setFirstToAct(3)
-        } else if (turn === 2) {
-            setActiveSBSelect(4)
-            setFirstToAct(1)
-        } else if (turn === 3) {
-            setActiveSBSelect(1)
-            setFirstToAct(4)
-        } else if (turn === 4) {
-            setActiveSBSelect(3)
-            setFirstToAct(2)
-        }
     }
 
     const userInivitingPlayerToGame = () => {
@@ -177,7 +162,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         moveMenu();
     }
 
-
     const toggleAddOnWindow = () => {
         setAddOnWindow(!addOnWindow);
         triggerGameMenuAnimation();
@@ -255,121 +239,54 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
 
         user.playerGameObj.setInGameInfo(gModel)
 
-        if (gModel.bigBlind === user.playerGameObj.turn) {
-            gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - gModel.ante), user.playerGameObj.turn);
+        // if (gModel.bigBlind === user.playerGameObj.turn) {
+        //     user.socket.emit('isABlind', 'bb');
+        // }
 
-            // CAUSING TYPERROR WITH SETTERCHIPS
-            // user.playerGameObj.displayChipsAnte(gModel.ante, 'bb');
+        // if (gModel.smallBlind === user.playerGameObj.turn) {
+        //     user.socket.emit('isABlind', 'sb');
+        // }
 
-            user.socket.emit('isABlind', 'bb');
-        }
-
-        if (gModel.smallBlind === user.playerGameObj.turn) {
-            gModel.setPlayerBorders(gameState, (user.playerGameObj.chips - (gModel.ante / 2)), user.playerGameObj.turn)
-
-            // CAUSING TYPERROR WITH SETTERCHIPS
-            // user.playerGameObj.displayChipsAnte(gModel.ante, 'sb')
-            user.socket.emit('isABlind', 'sb');
-        }
+        // gModel.setPlayerBorders(gameState, gameState.pChips[gModel.bigBlind - 1] - gameState.ante, gModel.bigBlind);
+        // gModel.setPlayerBorders(gameState, gameState.pChips[gModel.smallBlind - 1] - (gameState.ante / 2), gModel.smallBlind)
 
     })
 
-    user.socket.on('playerSubmitsBet', (turn, betAmount, pBettingChips) => {
+    user.socket.on('playerSubmitsBet', (turn, betAmount, stateArr) => {
         user.playerGameObj.displayBet();
-
-        if (!gModel.sidePotActive) {
-            gModel.setPot(betAmount, activePot, setActivePot);
-        } else {
-            gModel.setPot(betAmount, sidePot, setSidePot);
-        }
-
-        gModel.setNextTurn(turn, 'bet');
-        setGameTurn(gModel.currentTurn);
-
-        // TEST //
-        totalSidePots++
-        setTotalSidePots(totalSidePots);
-        setSidePotActive(true)
-
-        user.playerGameObj.currentGameTurn = gModel.currentTurn;
-        user.playerGameObj.betToCall = betAmount;
-
-        gModel.lastBet = betAmount;
-        gModel.currentBettor = turn;
-
-        gModel.setPlayerBorders(gameState, pBettingChips, turn);
-
-        if (pBettingChips === 0) {
-            gModel.setSidePotActive()
-        }
-        
+        gModel.handleBet(betAmount, activePot, setActivePot, turn, setGameTurn);
+        user.playerGameObj.setInGameInfo(gModel)
+        gameState.pChips = stateArr;
     })
 
     user.socket.on('playerFolds', (turn) => {
-        gModel.addPlayer2FoldedArr(turn);
-
-        gModel.setNextTurn(turn, 'fold');
-        setGameTurn(gModel.currentTurn);
-
-        gModel.handleFold(turn);
-
+        gModel.handleFold(turn, setGameTurn);
         user.playerGameObj.setInGameInfo(gModel);
     })
 
     user.socket.on('playerChecks', (turn) => {
-        gModel.setNextTurn(turn, 'check');
-        setGameTurn(gModel.currentTurn);
-
+        gModel.handleCheck(turn, setGameTurn)
         user.playerGameObj.setInGameInfo(gModel);
-
     })
 
-    user.socket.on('playerCallsBet', (turn, callAmount, playerChips) => {
+    user.socket.on('playerCallsBet', (turn, callAmount, stateArr) => {
         user.playerGameObj.displayCall();
-
-        if (!gModel.sidePotActive) {
-            gModel.setPot(callAmount, activePot, setActivePot);
-        } else {
-            gModel.setPot(callAmount, sidePot, setSidePot);
-        }
-
-        gModel.setNextTurn(turn, 'call');
-        setGameTurn(gModel.currentTurn);
-
-        gModel.setPlayerBorders(gameState, playerChips, turn)
-
+        gModel.handleCall(callAmount, activePot, setActivePot, turn, setGameTurn)
         user.playerGameObj.setInGameInfo(gModel);
+        gameState.pChips = stateArr;
 
     })
 
     user.socket.on('sendingBackWinnerOfRound', (winner, type) => {
         if (winner === user.playerGameObj.turn) {
-            if (type === 'main') {
-                user.playerGameObj.winnerOfRound(gModel.pot);
-            } else if (type === 'side') {
-                user.playerGameObj.winnerOfRound(gModel.sidePot);
-            }
+            user.playerGameObj.winnerOfRound(gModel.pot);
         }
+
     })
 
     user.socket.on('sendingBackInitNextRound', () => {
-        setWinnerChosen(false);
-        setRoundTransition(false);
-        setPlayerView(false);
-
-        gModel.startNextRound();
-
-        setActiveBBSelect(gModel.bigBlind)
-
-        gModel.initRound();
-
-        setGameTurn(gModel.currentTurn);
-
-        setActivePot(gModel.pot)
-
-        setActiveRound(gModel.currentRoundName);
-
-        user.playerGameObj.currentGameTurn = gModel.currentTurn;
+        gModel.initNextRound(setWinnerChosen, setRoundTransition, setPlayerView, setActiveBBSelect, setGameTurn, setActivePot, setActiveRound)
+        user.playerGameObj.setInGameInfo(gModel);
     })   
     
     user.socket.on('inviteToGameConfirmed', () => {
@@ -385,19 +302,12 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     })
 
     user.socket.on('playerHasLeftGame', (turn) => {
-        gameState.pNickNames[turn - 1] = undefined
-
         if (gameStarted) {
-            gModel.addPlayer2FoldedArr(turn);
-
-            gModel.setNextTurn(turn, 'fold');
-            setGameTurn(gModel.currentTurn);
-
-            gModel.handleFold(turn);
-
-            user.playerGameObj.currentGameTurn = gModel.currentTurn;
+            gModel.handlePlayerLeaving(gameState, gameStarted, turn, setGameTurn)
+            user.playerGameObj.setInGameInfo(gModel);
+        } else {
+            gameState.pNickNames[turn - 1] = undefined;
         }
-        
     })
 
     user.socket.on('sendingBackRSChange', (newRS) => {
@@ -408,19 +318,21 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         }
     })
 
-    user.socket.on('sendingBackAddOn', (turn, totalChips, totalBuyIn) => {
-
+    user.socket.on('sendingBackAddOn', (stateArr, stateArr2, totalChips) => {
         if (gameStarted) {
-            gModel.setPlayerBorders(gameState, totalChips, turn);
-            gModel.setTotalBuyIns(gameState, totalBuyIn, turn)
+            gModel.handleAddOn(gameState, stateArr, stateArr2, setResponseText, setReadyResponse);
         } else {
-            gameState.pChips[turn - 1] = totalChips;
-            gameState.totalBuyIns[turn - 1] = totalBuyIn;
+            gameState.pChips = stateArr;
+            gameState.totalBuyIns = stateArr2;
+            setResponseText('Chips Have Been Added On!');
+            setReadyResponse(true);
         }
-        
+
         user.playerGameObj.setChips(totalChips);
-        setResponseText('Chips Have Been Added On!');
-        setReadyResponse(true);
+    })
+
+    user.socket.on('grabbingGameStateMidGame', (userJoining) => {
+        socket.emit('sendingBackGameStateMidGame', gameState, userJoining);
     })
 
     //////////////////////////////////////////////////////////////////
@@ -450,7 +362,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     const InGameMenu = (
-        <Animated.View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '60%', height: '80%', left: '-110%', top: '10%', position: 'absolute', marginLeft: leftValue, display: inGameMenuActive === true ? 'flex' : 'none'}}>
+        <Animated.View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '60%', height: '80%', left: '-110%', top: '10%', position: 'absolute', marginLeft: leftValue, display: inGameMenuActive === true ? 'flex' : 'none', zIndex: 1}}>
         
             <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
                 onPress={() => toggleInGameMenu()}
@@ -520,7 +432,7 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     for (let i = 0; i < roomSize; i++) {
-        if (gameState.pNickNames[i] != undefined ) {
+        if (gameState.pNickNames[i] != undefined && gameState.pNickNames[i] != '+') {
             PlayersDisplayName = () => 
             <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 16}}>{gameState.pNickNames[i]}</Text>;
             PlayersDisplayChips = () => 
@@ -581,12 +493,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
         }
     }
 
-    let SidePotDisplay = (
-        <View style={{display: gameStarted === true && sidePotActive === true ? 'flex' : 'none', position: 'absolute', width: 170, height: 60, top: '45%', alignSelf: 'center', flexDirection: 'row'}}>
-            {sidePots}
-        </View>
-    )
-
     let blindLegend = (
         <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', width: '30%', height: '10%', position: 'absolute', top: 240, alignSelf: 'center', display: toggleBBSelect === true ? 'flex' : 'none'}}>
             <Text style={{textAlign: 'center', fontSize: 10}}>If Applicable</Text>
@@ -614,23 +520,19 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let submitWinnerButton = (
-        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '55%', marginTop: 10, alignSelf: 'center'}}>
-            <Button 
-                title='Submit'
-                color='black'
-                onPress={() => WinnerSubmitted()}
-            />
-        </View>
+        <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '55%', marginTop: 10, alignSelf: 'center'}}
+            onPress={() => WinnerSubmitted()}
+        >
+            <Text style={{fontFamily: 'Copperplate', textAlign: 'center', marginBottom: 5, marginTop: 5}}>Submit</Text>
+        </TouchableOpacity>
     )
 
     let nextRoundButton = (
-        <View style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lightgrey', width: '35%', top: '55%', alignSelf: 'center', display: roundTransition === true && winnerChosen === true ? 'flex' : 'none', position: 'absolute'}}>
-            <Button 
-                title='Next Round'
-                color='black'
-                onPress={() => user.socket.emit('initNextRound')}
-            />
-        </View>
+        <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', top: '55%', alignSelf: 'center', display: roundTransition === true && winnerChosen === true ? 'flex' : 'none', position: 'absolute'}}
+            onPress={() => user.socket.emit('initNextRound')}
+        >
+            <Text style={{fontFamily: 'Copperplate', textAlign: 'center', marginBottom: 5, marginTop: 5, fontSize: 20}}>Next Round</Text>
+        </TouchableOpacity>
     )
 
     let playerGameView = (
@@ -697,14 +599,16 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
     )
 
     let RestrictedInvitingPlayersWindow = (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', justifyContent: 'center', width: '85%', height: '35%', display: restrictionInvitingPlayers === true ? 'flex' : 'none', position: 'absolute'}}>
-            <TouchableOpacity style={{borderWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
+        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'papayawhip', alignSelf: 'center', justifyContent: 'center', width: '102%', height: '50%', display: restrictionInvitingPlayers === true ? 'flex' : 'none', position: 'absolute', top: '10%'}}>
+            <TouchableOpacity style={{borderBottomWidth: 2, borderRadius: 3, backgroundColor: 'lavender', position: 'absolute', top:-2, left: 0, width: '100%'}}
                 onPress={() => userXOutInvitingPlayer()}
             >
                 <Text style={style.xBttnFont}>X</Text>
             </TouchableOpacity>
             
-            <Text style={{textAlign: 'center'}}>{restrictionReason}</Text>
+            <View style={{width: '75%', alignSelf: 'center'}}>
+                <Text style={{textAlign: 'center', fontFamily: 'Copperplate', fontSize: 20}}>{restrictionReason}</Text>
+            </View>
         </View>
     )
 
@@ -869,7 +773,6 @@ export const GameViewModel = ({rS, user, gameObj, gameStarted, setGameStart, pla
             {ChangeGameSizeWindow}
             {GameInfoWindow}
             {AddOnWindow}
-            {SidePotDisplay}
         </View>
     )
 

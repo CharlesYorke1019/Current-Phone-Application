@@ -1,4 +1,5 @@
 class User {
+    // Variables //
     id;
     status;
     socket;
@@ -37,13 +38,33 @@ class User {
         this.socket = socket
     }
 
-    changeCurrentPage(newPosition) {
-        this.currentPage = newPosition;
+    // Groups Methods //
+
+    updateGroupsAll(groups) {
+        this.groups = groups;
+
+        for (let i = 0; i < this.groupNames.length; i++) {
+            if (this.groupNames[i] != groups.name) {
+                this.groupNames.splice(i, 1);
+            }
+        }
     }
 
+    addGroup(groupInfo) {
+        if (!this.groupNames.includes(groupInfo.name)) {
+            this.groups[groupInfo.name] = groupInfo;
+            this.groupNames.push(groupInfo.name)
+        }
+
+    }
+
+    updateGroupInfo(groupInfo) {
+        this.groups[groupInfo.name] = groupInfo;
+    }
+
+    // Alert Methods //
+
     addAlert(inviteInfo) {
-
-
         if (inviteInfo.type === 'friend_request') {
 
             if (!this.friendRequests.includes(inviteInfo.sender) && !this.friendsList.includes(inviteInfo.sender)) {
@@ -94,29 +115,36 @@ class User {
 
     }
 
-    addFriendToList(friendUsername) {
-        if (!this.friendsList.includes(friendUsername)) {
-            this.friendsList.push(friendUsername);
+    setAlertInteracted(alertInfo) {
+        for (let i = 0; i < this.alerts.length; i++) {
+            if (this.alerts[i].type === alertInfo.type && this.alerts[i].sender === alertInfo.sender) {
+                this.alerts[i].interacted = true;
+            }
         }
     }
 
-    addGroup(groupInfo) {
-        if (!this.groupNames.includes(groupInfo.name)) {
-            this.groups[groupInfo.name] = groupInfo;
-            this.groupNames.push(groupInfo.name)
+    deleteIntereactedAlerts() {
+        let arr = []
+        for (let i = 0; i < this.alerts.length; i++) {
+            if (!this.alerts[i].interacted) {
+                arr.push(this.alerts[i]);
+            }
         }
-
+        this.alerts = arr;
     }
 
-    updateGroupInfo(groupInfo) {
-        this.groups[groupInfo.name] = groupInfo;
+    checkForActiveAlerts(var1, cb1, cb2) {
+        if (this.alerts.length > 0) {
+            cb2(true)
+            setTimeout(() => {
+                cb1(!var1)
+            }, 300)
+        } else {
+            cb2(false)
+        }
     }
 
-    leaveGame(arg) {
-        this.socket.emit('userLeavesGame', arg);
-        this.currentPage = 'Home';
-        this.playerGameObject = {};
-    }
+    // Update Account Info Methods //
 
     updateAccountInfo(changeType, infoChanged) {
         if (changeType === 'username_change') {
@@ -130,6 +158,30 @@ class User {
 
     updateGameInfo(profileObj) {
         this.profileOptions = profileObj;
+    }
+
+    // Friends Methods //
+
+    addFriendToList(friendUsername) {
+        if (!this.friendsList.includes(friendUsername)) {
+            this.friendsList.push(friendUsername);
+        }
+    }
+
+    updateFriendsList(friendsList) {
+        this.friendsList = friendsList;
+    }
+
+    // Others //
+
+    changeCurrentPage(newPosition) {
+        this.currentPage = newPosition;
+    }
+
+    leaveGame(arg) {
+        this.socket.emit('userLeavesGame', arg);
+        this.currentPage = 'Home';
+        this.playerGameObject = {};
     }
 
     signsOut() {
@@ -177,34 +229,6 @@ class User {
         }
         
 
-    }
-
-    setAlertInteracted(alertInfo) {
-        for (let i = 0; i < this.alerts.length; i++) {
-            if (this.alerts[i].type === alertInfo.type && this.alerts[i].sender === alertInfo.sender) {
-                this.alerts[i].interacted = true;
-            }
-        }
-    }
-
-    deleteIntereactedAlerts() {
-        let arr = []
-        for (let i = 0; i < this.alerts.length; i++) {
-            if (!this.alerts[i].interacted) {
-                arr.push(this.alerts[i]);
-            }
-        }
-        this.alerts = arr;
-    }
-
-    updateGroupsAll(groups) {
-        this.groups = groups;
-
-        for (let i = 0; i < this.groupNames.length; i++) {
-            if (this.groupNames[i] != groups.name) {
-                this.groupNames.splice(i, 1);
-            }
-        }
     }
 
 }

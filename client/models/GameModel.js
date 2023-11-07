@@ -254,6 +254,11 @@ class GameModel {
 
                                 if (lastTurn === this.smallBlind || lastTurn === this.bigBlind) {
                                     this.currentTurn = this.gameArray[0];
+
+                                    if (this.gameSize === 2) {
+                                        this.changeRound(this.currentRound);
+                                    }
+
                                 } else {
                                     this.currentTurn = this.gameArray[0];
                                     this.changeRound(this.currentRound);
@@ -283,7 +288,7 @@ class GameModel {
         this.pFoldedArr.push(turn);
     }
 
-    handleFold(turn) {
+    removePlayerOnFold(turn) {
         for (let i = 0; i < this.gameArray.length; i++) {
             if (this.gameArray[i] === turn) {
                 this.gameArray.splice(i, 1);
@@ -355,6 +360,64 @@ class GameModel {
 
     setSidePotActive() {
         this.sidePotActive = true;
+    }
+
+    handleBet(bet, pot, setPotF, lastTurn, setNextTurnF) {
+        this.setPot(bet, pot, setPotF);
+        this.setNextTurn(lastTurn, 'bet');
+        setNextTurnF(this.currentTurn);
+        this.lastBet = bet;
+        this.currentBettor = lastTurn;
+
+    }
+
+    handleFold(lastTurn, setNextTurnF) {
+        this.addPlayer2FoldedArr(lastTurn);
+
+        this.setNextTurn(lastTurn, 'fold');
+        setNextTurnF(this.currentTurn);
+
+        this.removePlayerOnFold(lastTurn);
+    }
+
+    handleCheck(lastTurn, setNextTurnF) {
+        this.setNextTurn(lastTurn, 'check');
+        setNextTurnF(this.currentTurn);
+    }
+
+    handleCall(call, pot, setPotF, lastTurn, setNextTurnF) {
+        this.setPot(call, pot, setPotF);
+        this.setNextTurn(lastTurn, 'call');
+        setNextTurnF(this.currentTurn);
+    }
+
+    initNextRound(winnerCB, roundTransitionCB, playerViewCB, activeBbCB, setNextTurnCB, setPotCB, setRoundCB) {
+        winnerCB(false);
+        roundTransitionCB(false);
+        playerViewCB(false);
+        this.startNextRound();
+        activeBbCB(this.bigBlind)
+        this.initRound();
+        setNextTurnCB(this.currentTurn);
+        setPotCB(this.pot)
+        setRoundCB(this.currentRoundName);
+    }
+
+    handlePlayerLeaving(gameState, gameStarted, playerLeavingTurn, setNextTurnCB) {
+        gameState.pNickNames[turn - 1] = undefined
+        if (gameStarted) {
+            this.addPlayer2FoldedArr(playerLeavingTurn);
+            this.setNextTurn(playerLeavingTurn, 'fold');
+            setNextTurnCB(this.currentTurn);
+            this.handleFold(turn);
+        }
+    }
+
+    handleAddOn(gameState, stateArr1, stateArr2, setResponseTextCB, setReadyResponseCB) {
+        gameState.pChips = stateArr1;
+        gameState.totalBuyIns = stateArr2;
+        setResponseTextCB('Chips Have Been Added On!');
+        setReadyResponseCB(true);
     }
 
 }
