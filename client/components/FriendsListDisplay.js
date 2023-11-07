@@ -1,12 +1,20 @@
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 
-const FriendsListDisplay = ({username}) => {
+const FriendsListDisplay = ({username, cb1, cb2}) => {
+
+    const setInfo = () => {
+        cb2(username);
+        cb1();
+    }
 
     return (
-        <View style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignItems: 'center', maxWidth: '50%', height: '10%', justifyContent: 'center', marginLeft: 10, marginRight: 10, marginTop: 10}}>
+        <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignItems: 'center', height: '2%', justifyContent: 'center', marginLeft: 10, marginRight: 10, marginTop: 10}}
+            onPress={() => setInfo()}
+        >
             <Text style={{textAlign: 'center', fontSize: 24, marginRight: 20, marginLeft: 20, fontFamily: 'Copperplate'}}>{username}</Text>
-        </View>
+        </TouchableOpacity>
+
     )
 
 }
