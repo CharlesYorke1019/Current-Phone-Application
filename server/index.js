@@ -187,13 +187,17 @@ io.on('connection', (socket) => {
 
     socket.on('userSendsFriendRequest', (friendUsername) => {
         if (possibleAccounts[friendUsername]) {
-            let newAlert = {'type': 'friend_request', 'sender': userBEI.accountUsername, 'interacted': false}
-            possibleAccounts[friendUsername].pendingAlerts.push(newAlert);
-            possibleAccounts[friendUsername].friendRequests.push(userBEI.accountUsername);
-            io.to(possibleAccounts[friendUsername].idHolder).emit('sendingFriendRequestToReciever', newAlert)
-            socket.emit('friendRequestCleared');
+            if (!possibleAccounts[userBEI.accountUsername].friendsList.includes(friendUsername)) {
+                let newAlert = {'type': 'friend_request', 'sender': userBEI.accountUsername, 'interacted': false}
+                possibleAccounts[friendUsername].pendingAlerts.push(newAlert);
+                possibleAccounts[friendUsername].friendRequests.push(userBEI.accountUsername);
+                io.to(possibleAccounts[friendUsername].idHolder).emit('sendingFriendRequestToReciever', newAlert)
+                socket.emit('friendRequestCleared');
+            } else {
+                socket.emit('friendRequestFailed', 'already_friends');
+            }
         } else {
-            socket.emit('friendRequestFailed');
+            socket.emit('friendRequestFailed', 'doesnt_exist');
         }
     })
 
@@ -202,6 +206,23 @@ io.on('connection', (socket) => {
         possibleAccounts[alertInfo.sender].friendsList.push(userBEI.accountUsername);
         socket.emit('friendRequestAcceptedConfirmed', alertInfo, index);
         io.to(possibleAccounts[alertInfo.sender].idHolder).emit('userAcceptedFriendRequest', userBEI.accountUsername);
+    })
+
+    socket.on('userConfirmsRemoveFriend', (username) => {
+        if (possibleAccounts[username]) {
+            for (let i = 0; i < possibleAccounts[userBEI.accountUsername].friendsList.length; i++) {
+                if (possibleAccounts[userBEI.accountUsername].friendsList[i] === username) {
+                    possibleAccounts[userBEI.accountUsername].friendsList.splice(i, 1);
+                }
+            }
+            for (let i = 0; i < possibleAccounts[username].friendsList.length; i++) {
+                if (possibleAccounts[username].friendsList[i] === userBEI.accountUsername) {
+                    possibleAccounts[username].friendsList.splice(i, 1);
+                }
+            }
+            io.to(possibleAccounts[username].idHolder).emit('sendingBackRemovedAsFriend', possibleAccounts[username].friendsList);
+            socket.emit('friendRemovalConfirmed', possibleAccounts[userBEI.accountUsername].friendsList);
+        }
     })
 
     // Groups Listeners //
@@ -214,14 +235,19 @@ io.on('connection', (socket) => {
 
     socket.on('groupInviteSent', (username, groupName) => {
         if (possibleAccounts[username]) {
-            let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName, 'interacted': false}
-            possibleAccounts[username].pendingAlerts.push(newAlert)
 
-            io.to(possibleAccounts[username].idHolder).emit('sendingGroupInvite', newAlert);
-            socket.emit('groupInviteConfirmed');
+            if (!possibleAccounts[userBEI.accountUsername].groups[groupName].members.includes(username)) {
+                let newAlert = {'type': 'group_invite', 'sender': userBEI.accountUsername, 'groupName': groupName, 'interacted': false}
+                possibleAccounts[username].pendingAlerts.push(newAlert)
+
+                io.to(possibleAccounts[username].idHolder).emit('sendingGroupInvite', newAlert);
+                socket.emit('groupInviteConfirmed');
+            } else {
+                socket.emit('groupInviteFailed', 'member_already_in_group')
+            }
             
         } else {
-            socket.emit('groupInviteFailed');
+            socket.emit('groupInviteFailed', 'doesnt_exist');
         }
     })
 
@@ -413,17 +439,36 @@ io.on('connection', (socket) => {
 
     socket.on('playerSubmitsInGameDisplayInfo', (displayObj) => {
         if (globalState[userBEI.roomLabel]) {
-            globalState[userBEI.roomLabel].pNickNames.push(displayObj.enteredDisplayName)
-            globalState[userBEI.roomLabel].pChips.push(Number(displayObj.enteredDisplayBuyIn))
-            globalState[userBEI.roomLabel].players.push(userBEI.id)
-            globalState[userBEI.roomLabel].totalBuyIns.push(Number(displayObj.enteredDisplayBuyIn))
 
-            io.to(userBEI.roomLabel).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel], displayObj);
+            if (!globalState[userBEI.roomLabel].gameStarted) {
+                globalState[userBEI.roomLabel].pNickNames.push(displayObj.enteredDisplayName)
+                globalState[userBEI.roomLabel].pChips.push(Number(displayObj.enteredDisplayBuyIn))
+                globalState[userBEI.roomLabel].players.push(userBEI.id)
+                globalState[userBEI.roomLabel].totalBuyIns.push(Number(displayObj.enteredDisplayBuyIn))
 
-            if (globalState[userBEI.roomLabel].throughGroup) {
-                let newAlert = {'type': 'game_invite', 'sender': userBEI.accountUsername, 'gameCode': userBEI.roomLabel};
-                for (let i = 0; i < globalState[userBEI.roomLabel].groupMembersInvited.length; i++) {
-                    io.to(possibleAccounts[globalState[userBEI.roomLabel].groupMembersInvited[i]].idHolder).emit('sendingGroupGameInvite', newAlert);
+                io.to(userBEI.roomLabel).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel], displayObj);
+
+                if (globalState[userBEI.roomLabel].throughGroup) {
+                    let newAlert = {'type': 'game_invite', 'sender': userBEI.accountUsername, 'gameCode': userBEI.roomLabel};
+                    for (let i = 0; i < globalState[userBEI.roomLabel].groupMembersInvited.length; i++) {
+                        io.to(possibleAccounts[globalState[userBEI.roomLabel].groupMembersInvited[i]].idHolder).emit('sendingGroupGameInvite', newAlert);
+                    }
+                }
+            } else {
+                for (let i = 0; i < globalState[userBEI.roomLabel].pNickNames.length; i++) {
+                    let displayNameEl = globalState[userBEI.roomLabel].pNickNames[i];
+                    if (displayNameEl === '+') {
+                        let index = i;
+                        
+                        globalState[userBEI.roomLabel].pChips[index] = Number(displayObj.enteredDisplayBuyIn)
+                        globalState[userBEI.roomLabel].players[index] = userBEI.id
+                        globalState[userBEI.roomLabel].totalBuyIns[index] = Number(displayObj.enteredDisplayBuyIn);
+
+                        io.to(userBEI.roomLabel).emit('grabbingGameStateMidGame', displayObj.enteredDisplayName);
+
+                        displayNameEl = displayObj.enteredDisplayName;
+
+                    } 
                 }
             }
 
@@ -433,6 +478,11 @@ io.on('connection', (socket) => {
     socket.on('initGameStarted', (info, info2) => {
         io.to(userBEI.roomLabel).emit('sendingBackGameStart', info)
     })   
+
+    socket.on('sendingBackGameStateMidGame', (gameState, userJoining) => {
+        console.log(gameState);
+        io.to(possibleAccounts[userJoining].idHolder).emit('sendingUserToGamePage', userBEI.roomLabel, globalState[userBEI.roomLabel], displayObj)
+    })
 
     // In Game Listeners //
 
@@ -445,17 +495,21 @@ io.on('connection', (socket) => {
     })
 
     socket.on('userLeavesGame', (turn) => {
-        // globalState[userBEI.roomLabel].players[turn - 1] = '';
-        // globalState[userBEI.roomLabel].pNickNames[turn - 1] = '';
-        // globalState[userBEI.roomLabel].pChips[turn - 1] = '';
 
         // if there is more than one player (meaning the game will continue) 
         if (globalState[userBEI.roomLabel].players.length > 1) {
-            globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
-            globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
-            globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
+        
+            // globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
+            // globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
+
+            globalState[userBEI.roomLabel].players[turn - 1] = '';
+            globalState[userBEI.roomLabel].pNickNames[turn - 1] = '+';
+            globalState[userBEI.roomLabel].pChips[turn - 1] = '+';
+            globalState[userBEI.roomLabel].totalBuyIns[turn - 1] = '+'
 
             io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
+
+            globalState[userBEI.roomLabel].players[turn - 1] = '+'
 
         } else {
             // if there is only one player left (meaning the lobby will be disbanded)
@@ -466,24 +520,6 @@ io.on('connection', (socket) => {
 
         socket.leave(userBEI.roomLabel)
         userBEI.roomLabel = null;
-
-        // if (globalState[userBEI.roomLabel].players.length > 1) {
-        //     globalState[userBEI.roomLabel].players.splice(turn - 1, 1)
-        //     globalState[userBEI.roomLabel].pNickNames.splice(turn - 1, 1)
-        //     globalState[userBEI.roomLabel].pChips.splice(turn - 1, 1)
-        // }
-
-
-        // io.to(userBEI.roomLabel).emit('playerHasLeftGame', turn);
-
-        // if (globalState[userBEI.roomLabel].active) {
-        //     if (globalState[userBEI.roomLabel].players.length === 0) {
-        //         delete globalState[userBEI.roomLabel]   
-        //     }
-        // }
-
-        // socket.leave(userBEI.roomLabel)
-        // userBEI.roomLabel = null;
     })
 
     socket.on('roomSizeChanged', (newRS) => {
@@ -497,7 +533,7 @@ io.on('connection', (socket) => {
         globalState[userBEI.roomLabel].pChips[turn - 1] = totalChips;
         globalState[userBEI.roomLabel].totalBuyIns[turn - 1] += amount;
 
-        io.to(userBEI.roomLabel).emit('sendingBackAddOn', turn, totalChips, globalState[userBEI.roomLabel].totalBuyIns[turn - 1]);
+        io.to(userBEI.roomLabel).emit('sendingBackAddOn', globalState[userBEI.roomLabel].pChips, globalState[userBEI.roomLabel].totalBuyIns, amount);
     })
 
     socket.on('isABlind', (type) => {
@@ -507,11 +543,13 @@ io.on('connection', (socket) => {
     // PLAYER IN GAME LISTENERS //
 
     socket.on('pSubmitsBet', (turn, betAmount, playerChips) => {
-        io.to(userBEI.roomLabel).emit('playerSubmitsBet', turn, betAmount, playerChips)
+        globalState[userBEI.roomLabel].pChips[turn - 1] = playerChips;
+        io.to(userBEI.roomLabel).emit('playerSubmitsBet', turn, betAmount, globalState[userBEI.roomLabel].pChips)
     })
 
     socket.on('pCallsBet', (turn, callAmount, playerChips) => {
-        io.to(userBEI.roomLabel).emit('playerCallsBet', turn, callAmount, playerChips);
+        globalState[userBEI.roomLabel].pChips[turn - 1] = playerChips
+        io.to(userBEI.roomLabel).emit('playerCallsBet', turn, callAmount, globalState[userBEI.roomLabel].pChips);
     })
 
     socket.on('pFolds', (turn) => {
