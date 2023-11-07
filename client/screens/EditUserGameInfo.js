@@ -24,6 +24,12 @@ const EditUserGameInfo = ({user, setCurrentView}) => {
         'Non-serializable values were found in the navigation state',
     ]);
 
+    const userInitSaveInfo = () => {
+        if (usernameDisplay != user.profileOptions.useUsername || preSetChips != user.profileOptions.usePreSetChips || preSetChipsAmount != user.profileOptions.preSetChipAmount) {
+            setInitChangeInfo(true);
+        }
+    }
+
     const userSavesNewGameInfo = () => {
         user.socket.emit('newUserGameInfoSaved', usernameDisplay, preSetChips, preSetChipsAmount);
     }
@@ -118,7 +124,7 @@ const EditUserGameInfo = ({user, setCurrentView}) => {
                 </View>
 
                 <TouchableOpacity style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignSelf: 'center', width: '40%', position: 'absolute', alignSelf: 'center', top: '170%'}}
-                    onPress={() => setInitChangeInfo(true)}
+                    onPress={() => userInitSaveInfo()}
                 >
                     <Text style={{fontFamily: 'Copperplate', margin: 5, textAlign: 'center', fontSize: 20}}>Save</Text>
                 </TouchableOpacity>

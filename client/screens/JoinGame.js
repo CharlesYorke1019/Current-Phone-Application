@@ -57,6 +57,8 @@ const JoinGame = ({route}) => {
                             onChangeText={(gameCode) => enteredGameCode = gameCode}
                             style={styles.inputStyle}
                             placeholder='enter here'
+                            autoCapitalize='none'
+                            autoCorrect={false}
                         />
                 </View>
                 <TouchableOpacity style={{borderWidth: 2, borderRadius: 5, backgroundColor: 'lavender', width: '35%', alignSelf: 'center', position: 'absolute', top: '60%'}}

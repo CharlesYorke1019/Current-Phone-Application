@@ -32,7 +32,6 @@ const ProfilePage = ({route}) => {
     }
 
     user.deleteIntereactedAlerts();
-
     
     //////////////////////////////////////////////////////////////////
 
@@ -88,6 +87,10 @@ const ProfilePage = ({route}) => {
 
     user.socket.on('removedFromGroup', (groups) => {
         user.updateGroupsAll(groups);
+    })
+
+    user.socket.on('sendingBackRemovedAsFriend', (friendsList) => {
+        user.updateFriendsList(friendsList);
     })
 
     //////////////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-import { Button, Text, View, LogBox, TouchableOpacity } from 'react-native';
+import { Text, View, LogBox, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import CreatingGroupPage from './CreatingGroupPage';
@@ -46,7 +46,7 @@ const GroupsPage = ({route}) => {
 
     for (let i = 0; i < user.groupNames.length; i++) {
         groupsArr.push(
-            <TouchableOpacity key={i} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignItems: 'center', maxWidth: '30%', height: '10%', justifyContent: 'center', marginLeft: 10, marginRight: 10, marginTop: 10}}
+            <TouchableOpacity key={i} style={{borderWidth: 3, borderRadius: 5, backgroundColor: 'lavender', alignItems: 'center', justifyContent: 'center', margin: 10, height: '10%'}}
                 onPress={() => setSpecificGroupView(user.groupNames[i])}
             >
                 <Text style={{marginRight: 10, marginLeft: 10, textAlign: 'center', fontFamily: 'Copperplate', fontSize: 19}}>{user.groupNames[i]}</Text>
@@ -69,10 +69,8 @@ const GroupsPage = ({route}) => {
                 </TouchableOpacity>
 
 
-                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: 180, width: '95%', height: '75%', backgroundColor: 'papayawhip', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignSelf: 'center'}}>
-                   
+                <View style={{borderWidth: 3, borderRadius: 5, borderColor: 'black', position: 'absolute', top: 180, width: '95%', height: '75%', backgroundColor: 'papayawhip', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignSelf: 'center'}}>   
                     {groupsArr}
-
                 </View>
 
             </View>

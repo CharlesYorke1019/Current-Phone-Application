@@ -37,7 +37,7 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
 
                 setCurrentView(false);
 
-                if (submittedFriendUsername != null) {
+                if (usernameRef.current != null) {
                     usernameRef.current.clear();
                 }
             }
@@ -56,8 +56,12 @@ const InvitingFriendsToGroup = ({user, setCurrentView, groupName}) => {
         setResponseType(200)
     })
 
-    user.socket.on('groupInviteFailed', () => {
-        setResponseText('Group Invite Failed. Please Check The Username.')
+    user.socket.on('groupInviteFailed', (type) => {
+        if (type === 'member_already_in_group') {
+            setResponseText('Group Invite Failed. User Being Invited Is Already In The Group.')
+        } else if (type === 'doesnt_exist') {
+            setResponseText('Group Invite Failed. Please Check The Username.')
+        }
         setReadyResponse(true)
         setResponseType(400)
     })

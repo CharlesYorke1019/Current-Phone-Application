@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from 'react-native';
 import React, { useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -103,6 +103,7 @@ const CreateAccount = ({route}) => {
                         style={styles.inputStyle}
                         placeholder='Username'
                         ref={usernameRef}
+                        autoCorrect={false}
                     />
                     <TextInput 
                         value={passwordHolder}
@@ -112,6 +113,7 @@ const CreateAccount = ({route}) => {
                         placeholder='Password'
                         ref={passwordRef}
                         secureTextEntry={!showPassword}
+                        autoCorrect={false}
                     />
 
                     <MaterialCommunityIcons
@@ -129,6 +131,7 @@ const CreateAccount = ({route}) => {
                         placeholder='Confirm Password'
                         ref={confirmPasswordRef}
                         secureTextEntry={!showCPassword}
+                        autoCorrect={false}
                     />
 
                     <MaterialCommunityIcons

@@ -32,7 +32,7 @@ const CreatingGroupPage = ({setCreatingGroup, user}) => {
         } else {
             setCreatingGroup(false)
 
-            if (groupName != null) {
+            if (groupNameRef.current != null) {
                 groupNameRef.current.clear();
             }
         }

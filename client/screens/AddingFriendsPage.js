@@ -35,7 +35,7 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
         } else {
             setterAddingFriendInit(false);
 
-            if (submittedFriendUsername != null) {
+            if (usernameRef.current != null) {
                 usernameRef.current.clear();
             }
         }
@@ -54,12 +54,15 @@ const AddingFriendsPage = ({userObj, setterAddingFriendInit}) => {
         friendUsernameHolder = '';
     })
 
-    user.socket.on('friendRequestFailed', () => {
-        setResponseText('Friend Request Failed Please Check The Username.')
+    user.socket.on('friendRequestFailed', (type) => {
+        if (type === 'already_friends') {
+            setResponseText('Friend Request Failed. You Are Already Friends With The User You Tried To Add')
+        } else if (type === 'doesnt_exist') {
+            setResponseText('Friend Request Failed Please Check The Username.')
+        }
+
         setReadyResponse(true)
         setResponseType(400)
-
-        // usernameRef.current.clear();
     })
 
     //////////////////////////////////////////////////////////////////
